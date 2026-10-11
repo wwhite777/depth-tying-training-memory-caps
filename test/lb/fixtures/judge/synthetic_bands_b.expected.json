@@ -1,0 +1,29 @@
+{
+ "_synthetic": "SYNTHETIC FIXTURE for test/lb/test_judge.py; hand-constructed numbers, not an experimental result",
+ "status": "GO",
+ "n1_1": "PASS",
+ "disposition": "GO",
+ "holm_family_size": 21,
+ "classes": {
+  "HAR": "multiple crossings",
+  "KWS": "no event",
+  "CIFAR10": "no event"
+ },
+ "E_plus_caps": {
+  "HAR": [
+   256
+  ],
+  "KWS": [],
+  "CIFAR10": []
+ },
+ "E_minus_caps": {
+  "HAR": [
+   1024
+  ],
+  "KWS": [],
+  "CIFAR10": [
+   406,
+   512
+  ]
+ }
+}

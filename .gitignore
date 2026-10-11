@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+# datasets (downloaded and built by src/lb/prepare_data.py)
+data/
+# memory profiles extracted from the .tar.xz archives
+result/s4/profile_registry/
+result/s3/v4/calib_profiles/
+result/s3/calib_profiles/
+# written by the code when it is rerun
+research/s3/data_manifest.json.tmp
+result/figure/s8/logs/
+result/figure/s8/*.pptx
+rerun/

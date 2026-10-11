@@ -1,0 +1,135 @@
+{
+ "_synthetic": "SYNTHETIC FIXTURE for test/lb/test_judge.py; hand-constructed numbers, not an experimental result",
+ "prereg_sha256": "a0453c36acabf7fd72adca687951625b7b6ca51d5af9bcb6fe8f60b91d031c1b",
+ "caps_kib": [
+  256,
+  323,
+  406,
+  512,
+  645,
+  813,
+  1024
+ ],
+ "configs": [
+  {
+   "config_id": "low0",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low1",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low2",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low3",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low4",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low5",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low6",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low7",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low8",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "low9",
+   "measured_min_peak_bytes": 220000,
+   "predicted_min_peak_bytes": 275000,
+   "baselines": {
+    "param_count_with_state_multiplier": 220000,
+    "persistent_weights_gradients_optimizer": 220000,
+    "static_four_component_sum": 220000
+   }
+  },
+  {
+   "config_id": "high0",
+   "measured_min_peak_bytes": 1200000,
+   "predicted_min_peak_bytes": 1500000,
+   "baselines": {
+    "param_count_with_state_multiplier": 1200000,
+    "persistent_weights_gradients_optimizer": 1200000,
+    "static_four_component_sum": 1200000
+   }
+  },
+  {
+   "config_id": "high1",
+   "measured_min_peak_bytes": 1200000,
+   "predicted_min_peak_bytes": 1500000,
+   "baselines": {
+    "param_count_with_state_multiplier": 1200000,
+    "persistent_weights_gradients_optimizer": 1200000,
+    "static_four_component_sum": 1200000
+   }
+  }
+ ]
+}

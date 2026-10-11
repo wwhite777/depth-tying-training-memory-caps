@@ -1,0 +1,8 @@
+{
+ "_synthetic": "SYNTHETIC FIXTURE for test/lb/test_judge.py; hand-constructed numbers, not an experimental result",
+ "n2_1": "FAIL",
+ "n2_2": "FAIL",
+ "n_boundary_pairs": 12,
+ "b": 0,
+ "c": 10
+}

@@ -1,0 +1,216 @@
+# PREREGISTERED_loopbudget_v2.yaml — loopbudget (I-28 + I-31), S2 claim contract, amendment 1 (S3, before any outcome)
+# Machine-readable protocol. Human-readable text: CONTRIBUTION_CONTRACT_v2.md (its FREEZE-KEYS block must equal the values here).
+# FROZEN by src/gates/freeze_prereg.py --freeze (hashes in PREREGISTERED_loopbudget_v2.sha256; receipt in research/s3/amendment_v2/);
+# v1 (PREREGISTERED_loopbudget_v1.yaml with CONTRIBUTION_CONTRACT.md) stays unchanged; the block 'amends' lists every change.
+# Changes only via DECISION_LOG and a v3.
+protocol: loopbudget
+version: 2
+status: FROZEN
+date_frozen: "2026-10-10T06:22:16Z"
+date_drafted: "2026-10-10"
+amends:
+  version: 1
+  yaml_sha256: 6caec67aa54daf294a6fc091b42bfbc9d68d77b0cadd543d73801057c9f83703
+  contract_sha256: 5acc23619f5d56553b921a8702dc818c609279bd5550a1adb00b1340cd39ef69
+  decision_log: "DECISION_LOG.md 2026-10-10T06:20:53Z"
+  outcomes_seen: "none: no registry configuration profiled or trained; no S3 learning-rate, floor or pilot run"
+  changes:
+    - "equivalence_tolerances: the microbatch-accumulation gate moves to the accumulated gradient for every optimizer; the parameter check after three updates stays for sgd_momentum and sgd; adam and adafactor parameter differences are reported next to a reordering control; relative_error defined, including tensors whose exact gradient is identically zero by construction"
+    - "memory_knobs.accuracy_invariance: points to equivalence_tolerances"
+    - "measured_object.stack: torchaudio 2.10.0 for KWS features (environment amendment of 2026-10-10T05:45:08Z)"
+    - "training.schedule and training.lr_selection: formula, last partial batch and tie rule stated (readings fixed before any outcome)"
+    - "code_freeze_s3: the two-step reading pinned on 2026-10-10T05:52:05Z"
+author: "Builder: Claude Code (conductor claude-opus-5-5, effort max)"
+pi_adoption:
+  date: "2026-10-10T04:59Z"
+  words: "proceed as all recommended"
+  source: "research/CLAIM_OPTIONS_S1_v3.md (narrowed Option A); DECISION_LOG.md 2026-10-10"
+central_claim: >-
+  Within a frozen finite registry of depth-tied and distinct-parameter configurations trained from scratch on three tinyML
+  tasks, and under a common cap on peak requested PyTorch CPU tensor bytes between 256 KiB and 1024 KiB, we measure whether
+  the configuration each class selects on validation data reaches better held-out accuracy (A1), and whether a lifetime-aware
+  byte accounting computed before training predicts which configurations fit each cap (A2).
+
+measured_object:
+  name: "peak requested PyTorch CPU tensor bytes"
+  method: "torch.profiler CPU memory events (profile_memory=True); live bytes = exact storage bytes alive before the step plus signed allocation events; validated at S0 (known-size and planted-tensor proofs)"
+  unit: "bytes; caps stated in KiB, 1 KiB = 1024 bytes"
+  includes: [parameters, gradients, optimizer_state_including_step_tensors, microbatch_inputs_and_targets, tensors_saved_for_backward, transient_tensors_forward_backward_and_step]
+  excludes: [python_objects, allocator_headers_and_alignment_slack, blas_or_onednn_scratch, dataset_and_loader_buffers]
+  threads: 1
+  step: "steady state: the second full accumulation cycle (one optimizer update)"
+  stack: "torch 2.10.0+cu128 on CPU, fp32, Python 3.12.12 (research/s0/ENV_FREEZE_20261009.txt); torchaudio 2.10.0 added for KWS MFCC features only (research/s0/ENV_FREEZE_20261010_S3.txt)"
+  claims_not_made: [device_sram_fit, mcu_feasibility, gpu_memory, on_device_training]
+
+tasks:
+  HAR:
+    data: "UCI-HAR raw inertial signals, 9 channels x 128 steps, 6 classes (doi 10.24432/C54S4K, CC BY 4.0)"
+    split: "official train volunteers / official test volunteers; validation = the 4 highest-numbered training volunteers"
+    tokens: {n_tokens: 16, token_dim: 72, rule: "8 consecutive steps x 9 channels per token"}
+    normalization: "per-channel z-score from training volunteers"
+    classes: 6
+  KWS:
+    data: "Speech Commands v0.02 (CC BY 4.0), 12 classes: 10 keywords, unknown, silence"
+    split: "train = clips in neither official list; validation = validation_list.txt; test = the official 12-class test set archive (speech_commands_test_set_v0.02)"
+    class_balance: "unknown and silence each 10 percent of the train and validation sets (reference-implementation default)"
+    tokens: {n_tokens: 49, token_dim: 10, rule: "10 MFCC per frame, 40 ms window, 20 ms stride, 1 s clips"}
+    normalization: "per-coefficient z-score from the training clips"
+    classes: 12
+  CIFAR10:
+    data: "CIFAR-10 (Krizhevsky 2009)"
+    split: "train = first 45000 training images; validation = last 5000 training images; test = official 10000"
+    tokens: {n_tokens: 64, token_dim: 48, rule: "4 x 4 x 3 patches"}
+    normalization: "per-channel mean and std from the 45000 training images"
+    classes: 10
+
+architecture:
+  family_pilot: mixer
+  family_deferred_to_S6: convmixer
+  mixer_block: "pre-LayerNorm; token-mixing MLP (n_tokens -> n_tokens -> n_tokens, GELU) with residual; channel MLP (d -> 2d -> d, GELU) with residual"
+  embed: "Linear(token_dim -> d)"
+  head: "LayerNorm, mean over tokens, Linear(d -> classes)"
+  normalization: "LayerNorm only (no BatchNorm), so microbatch accumulation is exact"
+  dropout: 0
+  reversible_block: "additive coupling on two d/2 halves: y1 = x1 + F(x2), y2 = x2 + G(y1); F, G are Mixer sub-blocks on d/2 channels; activations recomputed from outputs in backward"
+
+registry:
+  widths: [24, 32, 48, 64]
+  wide_widths: [96, 128]
+  depths: [1, 2, 4, 8]
+  tied_class: [shared, two_groups, reversible_shared]
+  untied_class: [untied, reversible_untied, wide_single]
+  rules:
+    shared: "one block object applied T times, T in {2, 4, 8}"
+    two_groups: "blocks A repeated T/2 times then B repeated T/2 times, T in {4, 8}"
+    reversible_shared: "one coupling (F, G) applied T times, T in {2, 4, 8}"
+    untied: "T distinct blocks, T in {2, 4, 8}"
+    reversible_untied: "T distinct couplings, T in {2, 4, 8}"
+    wide_single: "T = 1, widths = widths + wide_widths (belongs to the untied class)"
+  optimizers: [adam, sgd_momentum, sgd, adafactor]
+  optimizer_settings:
+    adam: "betas (0.9, 0.999), eps 1e-8"
+    sgd_momentum: "momentum 0.9, no Nesterov"
+    sgd: "no momentum"
+    adafactor: "torch.optim.Adafactor defaults (beta2_decay -0.8, eps (None, 1e-3), d 1.0)"
+  implementation: {foreach: false, fused: false, shared_gradient_accumulation: "autograd default (out-of-place sum)", alternative_implementation_rerun: "S6 (control T6)"}
+  configurations_per_task: 248
+
+memory_knobs:
+  effective_batch: 64
+  microbatch: [1, 2, 4, 8, 16, 32, 64]
+  checkpointing: [off, per_block_exact]
+  checkpointing_note: "not combined with reversible structures (their backward already recomputes)"
+  accuracy_invariance: "microbatch with gradient accumulation and exact checkpointing do not change the trained model beyond floating-point reordering (S3 equivalence tests: equivalence_tolerances); each configuration is trained once at microbatch 64"
+  feasibility_rule: "configuration feasible at cap B iff min over knobs of measured peak <= B x 1024 bytes"
+
+training:
+  from_scratch: true
+  epochs: {HAR: 30, KWS: 20, CIFAR10: 30}
+  schedule: "cosine decay with 1 epoch of linear warmup: at optimizer step k (from 0) of K = epochs x W, with W = ceil(N_train / 64) steps per epoch (the last partial batch of each epoch is kept), lr_k = lr x k / W for k < W, else lr x 0.5 x (1 + cos(pi x (k - W) / (K - W)))"
+  weight_decay: 0
+  grad_clip_norm: 1.0
+  loss: "cross-entropy, mean over the effective batch"
+  lr_grid:
+    adam: [0.001, 0.003, 0.01]
+    sgd_momentum: [0.03, 0.1, 0.3]
+    sgd: [0.03, 0.1, 0.3]
+    adafactor: [0.001, 0.01, 0.03]
+  lr_selection: "per (task, optimizer, class): the grid value with the best final-epoch validation accuracy (seed 0) of the class reference configuration, ties broken by the smaller learning rate; a diverged run keeps its accuracy with non-finite logits counted as wrong; frozen at the end of S3"
+  reference_configs: {untied: "untied, T = 4, d = 32", tied: "shared, T = 4, d = 32"}
+
+seeds:
+  selection: [0]
+  confirmation: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  top_up: [11, 12]
+
+caps_kib: [256, 323, 406, 512, 645, 813, 1024]
+control_cap: unbounded
+selection:
+  rule: "per task, class and cap: argmax validation accuracy (seed 0, final epoch) over feasible configurations; ties broken by lower measured peak, then fewer parameters"
+  empty_class: "if a class has no feasible configuration at a cap, the cell is reported as infeasible for that class and has no Delta"
+  test_access: "only confirmation runs evaluate on the test split; development runs never load it (code-enforced and tested)"
+
+estimand:
+  delta: "mean over confirmation seeds of [test accuracy of the tied class's selected configuration minus test accuracy of the untied class's selected configuration], paired by seed"
+  unit: percentage_points
+  cells: "3 tasks x 7 caps = 21 cells; the unbounded control cell per task is reported outside the multiplicity family"
+
+inference:
+  unit: confirmation_seed_paired
+  interval: "paired t, df = number of seeds - 1"
+  alpha: 0.05
+  multiplicity: "Holm over the 21 cells, separately for each event family (union statements such as N1.1 PASS); the all-cells FAIL statement is an intersection-union test at the unadjusted level"
+  events:
+    E_plus: "one-sided test of Delta > floor_task"
+    E_minus: "one-sided test of Delta < -floor_task"
+    zero_sign: "two-sided test of Delta != 0"
+  no_event_meaning: "no practically important gain detected within the registry, tasks, procedures and caps; not a statement that sharing never helps"
+
+floor:
+  rule: "floor_task = max(1.0, 2 x SD_task) percentage points; SD_task = sample standard deviation over seeds 101-105 (disjoint from selection and confirmation seeds) of the final-epoch validation accuracy of the untied reference configuration (untied, T = 4, d = 32, adam at its selected learning rate)"
+  instantiation: "computed by a script at the end of S3 from training and validation data only; the three values are written to DECISION_LOG.md and locked before any S4 run; they are never changed in response to test accuracy or to any observed tied-versus-untied result; if a floor run diverges, that task uses 1.0"
+  justification: "1.0 point is the smallest gain treated as worth a change of architecture menu in a tinyML training engine; the 2 x SD term keeps the floor above seed noise; one test error is 100/N points (HAR about 0.034, KWS about 0.020, CIFAR-10 0.010), far below the floor"
+
+conjuncts:
+  N1.1:
+    statement: "existence of a practically important tied advantage in at least one cell"
+    pass: "at least one cell with E_plus significant after Holm"
+    fail: "every cell with a defined Delta has a one-sided 95 percent upper bound below its floor (intersection-union test: concluding that all cells lie below their floors needs no multiplicity adjustment)"
+    miss: "otherwise"
+  N1.2:
+    statement: "band structure per task (no event, band, everywhere tested, multiple crossings) from the E_plus, E_minus and zero_sign events"
+    judged: descriptive
+  N2.1:
+    statement: "the lifetime-aware accounting, frozen at the end of S3, predicts each registry configuration's min-over-knobs peak and its fit at each cap before training"
+    calibration: "S0 instrument shapes, the S3 reference configurations and a calibration grid disjoint from the registry (widths 40 and 56)"
+    held_out: "every registry configuration"
+    boundary_pairs: "(configuration, cap) pairs whose measured min-over-knobs peak lies within 20 percent of the cap"
+    pass: "at least 95 percent of registry configurations within 5 percent relative error AND fit accuracy at least 0.98 on boundary pairs"
+    fail: "fewer than 90 percent within 5 percent OR boundary fit accuracy below 0.95"
+    miss: "otherwise"
+  N2.2:
+    statement: "the lifetime-aware accounting classifies boundary-pair fit better than each graded baseline"
+    baselines: [param_count_with_state_multiplier, persistent_weights_gradients_optimizer, static_four_component_sum]
+    test: "exact McNemar on boundary pairs, Holm over the 3 baselines"
+    pass: "all three comparisons significant in favour of the lifetime-aware accounting"
+    fail: "any baseline significantly better"
+    miss: "otherwise"
+
+judge:
+  disposition:
+    GO: "N1.1 PASS"
+    KILL: "N1.1 FAIL"
+    INCONCLUSIVE: "N1.1 MISS after the single top-up"
+  top_up: "if N1.1 is MISS after seeds 1-10, add seeds 11 and 12 for every selected configuration once and re-judge; no second top-up"
+  early_stop: "stopping policy adopted by the PI on 2026-10-10: if N1.1 is not PASS (FAIL, or MISS after the top-up), the line does not expand beyond S4 and is written as a short bounded report or the accounting note; the stopping policy carries no scientific conclusion by itself"
+  outcome_language: "FAIL: no practically important tied gain within the tested registry, tasks, procedures and caps (every one-sided upper bound below its floor); INCONCLUSIVE: no gain above the floor detected and the intervals are too wide to exclude one; neither is reported as sharing never helping, and only FAIL supports removing tying from the tested menu"
+  reports: "exact values and intervals reported separately from display rounding; N1.2, N2.1 and N2.2 reported regardless of the disposition"
+
+classical_bars: [majority_class, linear_softmax_on_flattened_tokens]
+controls:
+  pilot: [T1_graded_feasibility_baselines, T2_microbatch_and_checkpoint_knobs_with_component_measurement, T3_optimizer_menu_for_both_classes, T4_pointer_shared_sanity_test, T7_unbounded_cap_cell, T9_equal_lr_search_validation_only_selection_fresh_confirmation_seeds, T10_two_groups_and_reversible_structures, T11_from_scratch_and_disjoint_splits]
+  deferred_to_S6: [T5_compute_limited_sensitivity, T6_alternative_implementation_rerun, T8_effective_batch_sensitivity, approximate_gradient_stratum, convmixer_family]
+s3_tests_required_before_s4: [pointer_shared_equals_looped, microbatch_accumulation_equivalence, exact_checkpoint_equivalence, reversible_gradient_and_inversion_check, dev_runs_never_load_test, profiler_known_size_and_planted_tensor, split_disjointness]
+interim_looks: "one analysis after all S4 confirmation runs; the single top-up; no other look at test accuracy"
+primary_contrast: "exact full-gradient training (exact checkpointing and microbatch accumulation allowed); truncated or implicit (equilibrium) gradients form a separate stratum with solver residuals and gradient checks, deferred to S6"
+equivalence_tolerances:
+  relative_error: "per tensor max|a - b| / max|reference|, then the maximum over tensors; a tensor whose exact gradient is identically zero by construction (tok2.bias of a Mixer block outside a reversible coupling: a per-token constant across channels that every downstream LayerNorm removes) is measured against the largest per-tensor max|reference| of the model"
+  microbatch_accumulation_gradient_rel: 1.0e-5
+  microbatch_accumulation_gradient_scope: "the gate: the accumulated gradient of one effective batch at microbatch 8 and 1 against microbatch 64, from the same state, for every structure and every optimizer"
+  microbatch_accumulation_parameter_rel: 1.0e-5
+  microbatch_accumulation_parameter_optimizers: [sgd_momentum, sgd]
+  microbatch_accumulation_parameter_scope: "parameters after three updates, for the optimizers whose update is linear in the gradient"
+  adaptive_optimizer_parameter_difference: "adam and adafactor: parameter differences after three updates are reported, not gated, next to a reordering control (microbatch 64, the examples of each effective batch reversed); one update of either optimizer turns rounding-level gradient differences on near-zero coordinates into parameter differences of the order of the learning rate"
+  exact_checkpoint_gradient_rel: 1.0e-6
+  reversible_gradient_rel: 1.0e-5
+  reversible_inversion_abs: 1.0e-5
+  pointer_shared_equality: "bitwise equal outputs, gradients, one update and allocator trace"
+rescope: "no RE-SCOPE on feasibility alone: feasibility differences between the classes are reported descriptively; the pilot runs on the frozen registry regardless"
+g2_resweep_before_s4: "required (PI decision 7 of 2026-10-10): a dated concurrent-work sweep before the first S4 run, with another attempt to read N2 to N4"
+failures: "every planned run is reported; a diverged run (non-finite loss) is kept and its non-finite logits count as wrong predictions; an execution error (crash, killed process, out-of-memory) is rerun once with the same seed and configuration, and both attempts are logged; no other run is repeated or dropped"
+code_freeze_s3: "the training harness and the profiler (src/lb/*.py except the predictor) are hashed (DECISION_LOG.md and research/s3/CODE_FREEZE_harness.json) before the S3 learning-rate and floor runs, which train only the two reference configurations and record no memory; the feasibility predictor is calibrated on the calibration grid only (widths 40 and 56) and hashed (research/s3/CODE_FREEZE_predictor.json) before any registry configuration is profiled; no other registry configuration is trained and none is profiled before both records exist; confirmatory runners (S4 selection and confirmation training, registry profiling) verify the YAML hash and the code records and stop with ERROR on a mismatch"
+budget:
+  ratified_cpu_core_hours_s0_to_s4: 250
+  sizing: "research/s2/pilot_sizing.json (estimate from the S0 calibration; an amendment is requested before S4 if the estimate exceeds the remaining cap)"
+fallback: "KILL or an unfeasible registry: the bounded negative or the accounting note; no change of tasks, caps or registry after outcomes"
+forbidden_wording_source: "REJECT_MEMO.md v2, section Forbidden wording"

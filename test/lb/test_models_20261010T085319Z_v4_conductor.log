@@ -1,0 +1,7 @@
+...........
+REPORT {'broken_inverse_reversible_shared': (1.144224890879324, 6.308317184448242), 'broken_inverse_reversible_untied': (1.3671766894847461, 3.232059955596924), 'calibration_grid_size': {'HAR': 120, 'KWS': 120, 'CIFAR10': 120}, 'checkpoint_cases': 108, 'checkpoint_max_rel': 0.0, 'n_params_d32_T4': {'HAR|shared|T4': 7462, 'HAR|two_groups|T4': 12326, 'HAR|untied|T4': 22054, 'HAR|wide_single|T1': 7462, 'HAR|reversible_shared|T4': 5958, 'HAR|reversible_untied|T4': 16038, 'KWS|shared|T4': 10032, 'KWS|two_groups|T4': 19252, 'KWS|untied|T4': 37692, 'KWS|wide_single|T1': 10032, 'KWS|reversible_shared|T4': 12884, 'KWS|reversible_untied|T4': 49100, 'CIFAR10|shared|T4': 14602, 'CIFAR10|two_groups|T4': 27242, 'CIFAR10|untied|T4': 52522, 'CIFAR10|wide_single|T1': 14602, 'CIFAR10|reversible_shared|T4': 20874, 'CIFAR10|reversible_untied|T4': 77610}, 'pointer_shared_calibration_shapes': 18, 'pointer_shared_cases': 120, 'reversible_cases': 72, 'reversible_max_grad_rel': 2.847782242115915e-06, 'reversible_max_inversion_abs': 4.32133674621582e-06, 'saved_tensor_counts': {(True, 2): 9, (True, 8): 9, (False, 2): 88, (False, 8): 328}}
+
+----------------------------------------------------------------------
+Ran 11 tests in 5.951s
+
+OK

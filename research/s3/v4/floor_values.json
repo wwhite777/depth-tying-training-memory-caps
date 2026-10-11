@@ -1,0 +1,124 @@
+{
+ "kind": "floor",
+ "rule": "floor_task = max(1.0, 2 x SD_task) percentage points; SD_task = sample standard deviation over seeds 101-105 (disjoint from selection and confirmation seeds) of the final-epoch validation accuracy of the untied reference configuration (untied, T = 4, d = 32, adam at its selected learning rate)",
+ "instantiation": "computed by a script at the end of S3 from training and validation data only; the three values are written to DECISION_LOG.md and locked before any S4 run; they are never changed in response to test accuracy or to any observed tied-versus-untied result; if a floor run diverges, that task uses 1.0",
+ "unit": "percentage_points",
+ "floors": {
+  "HAR": {
+   "config_id": "HAR|untied|d32|T4|adam",
+   "lr": 0.001,
+   "seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+   ],
+   "final_val_acc": [
+    93.26599326599326,
+    91.24579124579125,
+    94.006734006734,
+    93.53535353535354,
+    94.20875420875421
+   ],
+   "diverged_seeds": [],
+   "sd": 1.1821970288823385,
+   "two_sd": 2.364394057764677,
+   "floor": 2.364394057764677,
+   "results": [
+    "result/s3/v4/floor/HAR__untied__adam__lr0.001__s101/result.json",
+    "result/s3/v4/floor/HAR__untied__adam__lr0.001__s102/result.json",
+    "result/s3/v4/floor/HAR__untied__adam__lr0.001__s103/result.json",
+    "result/s3/v4/floor/HAR__untied__adam__lr0.001__s104/result.json",
+    "result/s3/v4/floor/HAR__untied__adam__lr0.001__s105/result.json"
+   ]
+  },
+  "KWS": {
+   "config_id": "KWS|untied|d32|T4|adam",
+   "lr": 0.01,
+   "seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+   ],
+   "final_val_acc": [
+    92.30935407215381,
+    92.37416288615252,
+    91.61806005616764,
+    91.63966299416721,
+    91.66126593216677
+   ],
+   "diverged_seeds": [],
+   "sd": 0.38553830843756226,
+   "two_sd": 0.7710766168751245,
+   "floor": 1.0,
+   "results": [
+    "result/s3/v4/floor/KWS__untied__adam__lr0.01__s101/result.json",
+    "result/s3/v4/floor/KWS__untied__adam__lr0.01__s102/result.json",
+    "result/s3/v4/floor/KWS__untied__adam__lr0.01__s103/result.json",
+    "result/s3/v4/floor/KWS__untied__adam__lr0.01__s104/result.json",
+    "result/s3/v4/floor/KWS__untied__adam__lr0.01__s105/result.json"
+   ]
+  },
+  "CIFAR10": {
+   "config_id": "CIFAR10|untied|d32|T4|adam",
+   "lr": 0.01,
+   "seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+   ],
+   "final_val_acc": [
+    64.9,
+    65.34,
+    64.32,
+    65.64,
+    66.1
+   ],
+   "diverged_seeds": [],
+   "sd": 0.6836665854054884,
+   "two_sd": 1.3673331708109768,
+   "floor": 1.3673331708109768,
+   "results": [
+    "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s101/result.json",
+    "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s102/result.json",
+    "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s103/result.json",
+    "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s104/result.json",
+    "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s105/result.json"
+   ]
+  }
+ },
+ "floor_values": {
+  "HAR": 2.364394057764677,
+  "KWS": 1.0,
+  "CIFAR10": 1.3673331708109768
+ },
+ "prereg_sha256": "a0453c36acabf7fd72adca687951625b7b6ca51d5af9bcb6fe8f60b91d031c1b",
+ "code_freeze": {
+  "harness": "f05473becb7c7b566c89edc0ef1a61c3cae7f251da4ce08545c5a6131e825e27"
+ },
+ "inputs_sha256": {
+  "research/s3/v4/CODE_FREEZE_harness.json": "f05473becb7c7b566c89edc0ef1a61c3cae7f251da4ce08545c5a6131e825e27",
+  "research/s3/v4/lr_selected.json": "84f07207ac635bc9e44023e0092ca826b66fd12c79b93b6bc35e1150cc6028d8",
+  "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s101/result.json": "d5f3cbe2fc8d633e8f6e576001cda0f8d264cb54b7bde672a5cb439870418f1f",
+  "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s102/result.json": "67915cffd52b36646e8431c2d198876ab06a164450a8e60fc1234b5e44bcfba1",
+  "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s103/result.json": "67f637234855f9270dd1012c443bbeb01e31755585de0dc342402d22c75725ec",
+  "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s104/result.json": "ff869b6ebf08d81075585ab25c09a3ffdd0ccbd47c74720300a665a905c892e9",
+  "result/s3/v4/floor/CIFAR10__untied__adam__lr0.01__s105/result.json": "7ff4ea6f2498e3c05c3a977e6b2f2d15fa1f8328d1c5bb2f4685629c884ae52e",
+  "result/s3/v4/floor/HAR__untied__adam__lr0.001__s101/result.json": "499fd494c70358a1e4145a4ad9d1c1eaa735a79f2f790640f09e33dc17aa6612",
+  "result/s3/v4/floor/HAR__untied__adam__lr0.001__s102/result.json": "a323f32ec50039617ed3f118d6b97ad815035cf743e6add636bf9a6942c68c31",
+  "result/s3/v4/floor/HAR__untied__adam__lr0.001__s103/result.json": "81df79453bc0a540c20bab387842117293314097efbeef3ed5f695435265dd5a",
+  "result/s3/v4/floor/HAR__untied__adam__lr0.001__s104/result.json": "047cba7242cf45d7626f4801d47ff327e1075ed1cd75e0a114c1be4f078996b2",
+  "result/s3/v4/floor/HAR__untied__adam__lr0.001__s105/result.json": "c99632bc30b7bc71220dee929691120e6aec9c268481f4d908a83d2c36aa70e8",
+  "result/s3/v4/floor/KWS__untied__adam__lr0.01__s101/result.json": "87a2657242af61e70608dd8a933ede8e5c4cd32e5977050a5b676bdfbc116f21",
+  "result/s3/v4/floor/KWS__untied__adam__lr0.01__s102/result.json": "0c2cc928906366391326afa42a9d794a173888083c7886c36ce025eea35562a1",
+  "result/s3/v4/floor/KWS__untied__adam__lr0.01__s103/result.json": "cc4c8a59242171aef8ed4078d618f6e1ab3049d9f0cb2a624706bfac0746986d",
+  "result/s3/v4/floor/KWS__untied__adam__lr0.01__s104/result.json": "54ca746b3e60a8be6e00289f6a4e2e97581c163f09bd02c59cbf90debdb867b3",
+  "result/s3/v4/floor/KWS__untied__adam__lr0.01__s105/result.json": "141c2b4c1423fa21689f9afce720b1bef051aab3c5cc1551ee617bddd557dff2"
+ },
+ "written_utc": "2026-10-10T10:27:05Z"
+}

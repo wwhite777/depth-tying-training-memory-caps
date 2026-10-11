@@ -1,0 +1,20 @@
+# Figure environment (Python 3.12.12): the figure scripts and check_figures.py under result/figure/s8/.
+# scipy and pyyaml are added so that the same environment can also run the frozen judge.
+contourpy==1.4.0
+cycler==0.12.1
+fonttools==4.66.1
+kiwisolver==1.5.1
+lxml==6.1.3
+matplotlib==3.11.2
+numpy==2.5.4
+packaging==26.3
+pandas==3.0.6
+pillow==12.3.0
+pymupdf==1.28.2
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+python-pptx==1.0.2
+six==1.17.0
+typing-extensions==4.16.0
+scipy==1.18.1
+pyyaml==6.0.3

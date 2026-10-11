@@ -1,0 +1,10 @@
+{
+ "files": {
+  "research/s3/v4/predictor_calibration.json": "e10ba60d4df0993717d580d13e8f64016ecd94668d01f8713e751b2c05aee917",
+  "src/lb/predictor.py": "1e3337e706a98a793caa2c0836e8715cca2430a7c1868fcc21eb9601413fb66a",
+  "src/lb/predictor_sim.py": "496f15f4e8a605244be226169ec92ed14343d52ae403d7dcc37391a479155590"
+ },
+ "name": "predictor",
+ "prereg_sha256": "a0453c36acabf7fd72adca687951625b7b6ca51d5af9bcb6fe8f60b91d031c1b",
+ "written_utc": "2026-10-10T10:31:20Z"
+}

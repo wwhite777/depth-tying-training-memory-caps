@@ -1,0 +1,21 @@
+{
+ "files": {
+  "src/lb/__init__.py": "fb1414703a034906d823ee24a4ae1b2cecbc5c52b67f702b7610ee28c21ffe6b",
+  "src/lb/data.py": "4670a744719dfd8f18d75658eb55b0659561386004fe5a9f468d6c0518707efa",
+  "src/lb/floor.py": "2074b9f5aca19d0048aed32944af9780470960edcaf097af87aa382e01755c2f",
+  "src/lb/freeze.py": "41de7f5bd6c9e11bd69fe9b5ba83bb1563435268b02afd89d8c8df7a6ec66183",
+  "src/lb/judge.py": "c7f09667b3cff0aacdeffc415743b645896af446d13e0ebf1de551169fe151ba",
+  "src/lb/launch.py": "2844ede635b09dd9405d13c28ffeaba3b36ce3eb8cccd021fa6f5ce8d773b78a",
+  "src/lb/models.py": "2b8020d086f4099f5f1205da8ae43ab079fdbdc4184264f9bca2cddfb6bde725",
+  "src/lb/prepare_data.py": "e5dd7cd1a9553423dbe8955f381e07a2377b772314a26e215d9776206334ac86",
+  "src/lb/prereg.py": "ce119550c382b6021b827420afda8ab813f8f729f6ee47f6d097c28c837bc25e",
+  "src/lb/profiler.py": "7c5da2e8a49f072d72bfe09163e44f10b263382854c288b2826ab656180bcbbf",
+  "src/lb/registry.py": "91a3f65163e3abe771fc8579206fd8a324994fece64b04d1e26fea1b2c7021e7",
+  "src/lb/select_lr.py": "ae681dd7825efd5b3ee2c5d69117ebc837c7e39f8d5a9c119e8dfca8e44a1c3f",
+  "src/lb/specs.py": "94eae7953a9e70660d833b058a104add3f656712dd425e229abaf0b8b30db060",
+  "src/lb/train.py": "0774ee598b0ed1e5f242720c7dbc437ca1ace0a75e8e329f125dcd1cb432db5a"
+ },
+ "name": "harness",
+ "prereg_sha256": "a0453c36acabf7fd72adca687951625b7b6ca51d5af9bcb6fe8f60b91d031c1b",
+ "written_utc": "2026-10-10T08:58:49Z"
+}

@@ -1,0 +1,28 @@
+# Figure 3. Difference in test accuracy between the selected depth-tied and distinct-parameter configurations (Δ, percentage points; mean over seeds 1–12) in each task and cap. Bars run from the mean to the one-sided 95% upper bound. Solid line: +floor; dashed line: −floor; thin line: zero. Triangle: E− (Δ below −floor, Holm-adjusted p < 0.05); open square: Δ ≠ 0 (two-sided, Holm-adjusted p < 0.05). No cell shows E+. Orange: unbounded control cells, outside the Holm family. Adjacent caps with the same selected pair show the same value.
+# x_position: plotting position (caps evenly spaced 0-6; unbounded set apart)
+# source: research/s4/judge_final_20261011T054347Z.json sha256 e0bc089578fbff704af37098269b2caa334bc12ff65094c7eacec242476e35b1
+task,cap_kib,x_position,mean_delta_pp,upper_bound_95_pp,floor_pp,E_plus,E_minus,zero_sign,in_holm_family
+HAR,256,0,-0.2912566451758849,0.24492730083618253,2.364394057764677,False,False,False,True
+HAR,323,1,-0.2912566451758849,0.24492730083618253,2.364394057764677,False,False,False,True
+HAR,406,2,-1.0915054858047728,-0.38568859560223734,2.364394057764677,False,False,False,True
+HAR,512,3,-1.0915054858047728,-0.38568859560223734,2.364394057764677,False,False,False,True
+HAR,645,4,-1.0915054858047728,-0.38568859560223734,2.364394057764677,False,False,False,True
+HAR,813,5,-1.0915054858047728,-0.38568859560223734,2.364394057764677,False,False,False,True
+HAR,1024,6,-1.0915054858047728,-0.38568859560223734,2.364394057764677,False,False,False,True
+HAR,unbounded,8.0,-1.1395769709308894,-0.5577943590403166,2.364394057764677,False,False,False,False
+KWS,256,0,-0.3476482617586889,-0.042649006420607594,1.0,False,False,False,True
+KWS,323,1,0.13292433537832574,0.38480421925381125,1.0,False,False,False,True
+KWS,406,2,0.8060668029993181,1.289697932142764,1.0,False,False,False,True
+KWS,512,3,-0.04430811179277564,0.27534240883368144,1.0,False,False,False,True
+KWS,645,4,0.7719836400818009,1.138296550580331,1.0,False,False,False,True
+KWS,813,5,0.7719836400818009,1.138296550580331,1.0,False,False,False,True
+KWS,1024,6,-0.1158827539195606,0.2972613521257366,1.0,False,False,False,True
+KWS,unbounded,8.0,-0.5419222903885483,-0.25343399417008555,1.0,False,False,False,False
+CIFAR10,256,0,-0.7750000000000016,-0.40354667279016726,1.3673331708109768,False,False,False,True
+CIFAR10,323,1,-1.4591666666666676,-1.130462367679665,1.3673331708109768,False,False,True,True
+CIFAR10,406,2,-2.4699999999999993,-1.9579031808127794,1.3673331708109768,False,True,True,True
+CIFAR10,512,3,-0.384999999999998,0.03548431017471987,1.3673331708109768,False,False,False,True
+CIFAR10,645,4,-0.4974999999999987,-0.10664492166497291,1.3673331708109768,False,False,False,True
+CIFAR10,813,5,-0.6308333333333328,-0.22599832699955097,1.3673331708109768,False,False,False,True
+CIFAR10,1024,6,-0.6308333333333328,-0.22599832699955097,1.3673331708109768,False,False,False,True
+CIFAR10,unbounded,8.0,-3.805000000000001,-3.4965110093762153,1.3673331708109768,False,False,False,False
