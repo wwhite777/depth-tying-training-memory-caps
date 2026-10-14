@@ -1,0 +1,1568 @@
+{
+ "kind": "s9_transfer_probe_timing",
+ "torch": "2.10.0+cpu",
+ "threads": {
+  "intra_op": 1,
+  "inter_op": 1
+ },
+ "warmup_steps": 3,
+ "timed_steps": 10,
+ "effective_batch": 64,
+ "seed": 1,
+ "workers": 7,
+ "inputs": "torch.randn(64, n_tokens, token_dim), torch.randint(classes, (64,)), generator seed 1",
+ "estimate_methods": {
+  "pure": "K x t1",
+  "additive": "W + K x (t1 - t64)",
+  "ratio": "K x t1 x W / (K x t64)"
+ },
+ "prereg_sha256": "a0453c36acabf7fd72adca687951625b7b6ca51d5af9bcb6fe8f60b91d031c1b",
+ "argv": [
+  "research/s9/transfer_probe/timing_probe.py",
+  "--out",
+  "research/s9/transfer_probe/timing_20261014T070439Z.json"
+ ],
+ "end_utc": "2026-10-14T07:06:03Z",
+ "rows": [
+  {
+   "config_id": "HAR|reversible_shared|d32|T4|adafactor",
+   "task": "HAR",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": false
+   },
+   "lr": 0.1,
+   "n_params": 5958,
+   "min_peak_bytes": 120136,
+   "epochs": 30,
+   "n_train": 5867,
+   "steps_per_run": 2760,
+   "archived_run": "result/s4/confirm/HAR__reversible_shared__d32__T4__adafactor__lr0.1__s1",
+   "archived_wall_s": 42.794299280736595,
+   "archived_confirm_wall_s_median": 42.00993273500353,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 5.019958276767284,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": false,
+    "step_seconds": [
+     0.507763434201479,
+     0.3556188507936895,
+     0.3568874951452017,
+     0.35557678900659084,
+     0.35613229824230075,
+     0.35603894200176,
+     0.3553201397880912,
+     0.3531223451718688,
+     0.35199929401278496,
+     0.35162435518577695
+    ],
+    "median_s": 0.35559781990014017,
+    "mean_s": 0.37000839435495436,
+    "min_s": 0.35162435518577695,
+    "max_s": 0.507763434201479,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.013531330041587353,
+     0.013520488049834967,
+     0.013787012081593275,
+     0.013714252971112728,
+     0.013726057950407267,
+     0.013659324962645769,
+     0.013722117990255356,
+     0.013628959190100431,
+     0.013622712809592485,
+     0.013713385909795761
+    ],
+    "median_s": 0.013686355436220765,
+    "mean_s": 0.013662564195692539,
+    "min_s": 0.013520488049834967,
+    "max_s": 0.013787012081593275,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 25.98192203594648,
+   "estimate": {
+    "pure_s": 981.4499829243869,
+    "additive_s": 986.4699412011541,
+    "ratio_s": 1111.8781474950588
+   }
+  },
+  {
+   "config_id": "HAR|untied|d24|T2|adafactor",
+   "task": "HAR",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 7982,
+   "min_peak_bytes": 109160,
+   "epochs": 30,
+   "n_train": 5867,
+   "steps_per_run": 2760,
+   "archived_run": "result/s4/confirm/HAR__untied__d24__T2__adafactor__lr0.1__s1",
+   "archived_wall_s": 12.617211107164621,
+   "archived_confirm_wall_s_median": 12.856565667316318,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 1.8795321676880121,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.135484020691365,
+     0.13787666615098715,
+     0.138383979909122,
+     0.13569629937410355,
+     0.13752358173951507,
+     0.137149877846241,
+     0.13709356589242816,
+     0.1379490508697927,
+     0.13831688230857253,
+     0.13788732467219234
+    ],
+    "median_s": 0.1377001239452511,
+    "mean_s": 0.13733612494543196,
+    "min_s": 0.135484020691365,
+    "max_s": 0.138383979909122,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.003882182762026787,
+     0.003967229276895523,
+     0.00399441085755825,
+     0.0038554295897483826,
+     0.0038407291285693645,
+     0.0037663993425667286,
+     0.0038987440057098866,
+     0.003854248207062483,
+     0.003917267080396414,
+     0.0039038872346282005
+    ],
+    "median_s": 0.0038904633838683367,
+    "mean_s": 0.003888052748516202,
+    "min_s": 0.0037663993425667286,
+    "max_s": 0.00399441085755825,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 35.39427321594122,
+   "estimate": {
+    "pure_s": 380.05234208889306,
+    "additive_s": 381.93187425658107,
+    "ratio_s": 446.57701715019283
+   }
+  },
+  {
+   "config_id": "HAR|reversible_untied|d64|T2|adafactor",
+   "task": "HAR",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": false
+   },
+   "lr": 0.1,
+   "n_params": 24646,
+   "min_peak_bytes": 332264,
+   "epochs": 30,
+   "n_train": 5867,
+   "steps_per_run": 2760,
+   "archived_run": "result/s4/confirm/HAR__reversible_untied__d64__T2__adafactor__lr0.1__s1",
+   "archived_wall_s": 38.57199158379808,
+   "archived_confirm_wall_s_median": 37.74698935332708,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 4.8505611889995635,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": false,
+    "step_seconds": [
+     0.2073180228471756,
+     0.2078875321894884,
+     0.21101235877722502,
+     0.21128167398273945,
+     0.20983816590160131,
+     0.21159257180988789,
+     0.2117915959097445,
+     0.21098930714651942,
+     0.20828557293862104,
+     0.20628712698817253
+    ],
+    "median_s": 0.21041373652406037,
+    "mean_s": 0.20962839284911752,
+    "min_s": 0.20628712698817253,
+    "max_s": 0.2117915959097445,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.012757769785821438,
+     0.012209108099341393,
+     0.012630003970116377,
+     0.01186420302838087,
+     0.011513343080878258,
+     0.011460782960057259,
+     0.0122267110273242,
+     0.012617573142051697,
+     0.01199082238599658,
+     0.012413972988724709
+    ],
+    "median_s": 0.012217909563332796,
+    "mean_s": 0.012168429046869277,
+    "min_s": 0.011460782960057259,
+    "max_s": 0.012757769785821438,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 17.221746112406468,
+   "estimate": {
+    "pure_s": 580.7419128064066,
+    "additive_s": 585.5924739954062,
+    "ratio_s": 664.2770461060495
+   }
+  },
+  {
+   "config_id": "KWS|shared|d32|T2|adafactor",
+   "task": "KWS",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 10032,
+   "min_peak_bytes": 218368,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__shared__d32__T2__adafactor__lr0.1__s1",
+   "archived_wall_s": 115.53227512305602,
+   "archived_confirm_wall_s_median": 111.48670730157755,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 25.477774596307427,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.14445373369380832,
+     0.1461695320904255,
+     0.14783646306023002,
+     0.14761018194258213,
+     0.14785895915701985,
+     0.14557171612977982,
+     0.1460310579277575,
+     0.14590841671451926,
+     0.14443544717505574,
+     0.14732663240283728
+    ],
+    "median_s": 0.1461002950090915,
+    "mean_s": 0.14632021402940154,
+    "min_s": 0.14443544717505574,
+    "max_s": 0.14785895915701985,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.007474151905626059,
+     0.007662446238100529,
+     0.007657684851437807,
+     0.00804847665131092,
+     0.007183825131505728,
+     0.007403514813631773,
+     0.007134446874260902,
+     0.007032907102257013,
+     0.007509957998991013,
+     0.00754134776070714
+    ],
+    "median_s": 0.007492054952308536,
+    "mean_s": 0.007464875932782888,
+    "min_s": 0.007032907102257013,
+    "max_s": 0.00804847665131092,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 19.500697197111915,
+   "estimate": {
+    "pure_s": 1756.1255460092798,
+    "additive_s": 1781.6033206055872,
+    "ratio_s": 2252.9599136681413
+   }
+  },
+  {
+   "config_id": "KWS|untied|d24|T2|adafactor",
+   "task": "KWS",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 15356,
+   "min_peak_bytes": 211768,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__untied__d24__T2__adafactor__lr0.1__s1",
+   "archived_wall_s": 97.30101105198264,
+   "archived_confirm_wall_s_median": 96.62834029295482,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 18.15220103505999,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.145346290897578,
+     0.1454292251728475,
+     0.14609072590246797,
+     0.14590904815122485,
+     0.14359062630683184,
+     0.14422751078382134,
+     0.14589917240664363,
+     0.14457699796184897,
+     0.14521082397550344,
+     0.1469871667213738
+    ],
+    "median_s": 0.14538775803521276,
+    "mean_s": 0.14532675882801413,
+    "min_s": 0.14359062630683184,
+    "max_s": 0.1469871667213738,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.006623350083827972,
+     0.006777862086892128,
+     0.006638999097049236,
+     0.00660518417134881,
+     0.006179932039231062,
+     0.006564334966242313,
+     0.006677199620753527,
+     0.006562807131558657,
+     0.006526239216327667,
+     0.00654959212988615
+    ],
+    "median_s": 0.006584759568795562,
+    "mean_s": 0.006570550054311753,
+    "min_s": 0.006179932039231062,
+    "max_s": 0.006777862086892128,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 22.079433047819858,
+   "estimate": {
+    "pure_s": 1747.5608515832573,
+    "additive_s": 1765.7130526183173,
+    "ratio_s": 2148.3511590074304
+   }
+  },
+  {
+   "config_id": "KWS|two_groups|d32|T4|adafactor",
+   "task": "KWS",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 19252,
+   "min_peak_bytes": 317672,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__two_groups__d32__T4__adafactor__lr0.1__s1",
+   "archived_wall_s": 205.86703700525686,
+   "archived_confirm_wall_s_median": 204.5792619730346,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 43.91275960067287,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.2568188766017556,
+     0.256753521040082,
+     0.2601467287167907,
+     0.26307365391403437,
+     0.25927921710535884,
+     0.25964544294402003,
+     0.25883791921660304,
+     0.2585035669617355,
+     0.2572347871027887,
+     0.26085717184469104
+    ],
+    "median_s": 0.25905856816098094,
+    "mean_s": 0.259115088544786,
+    "min_s": 0.256753521040082,
+    "max_s": 0.26307365391403437,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.014120151288807392,
+     0.013815249782055616,
+     0.013350391294807196,
+     0.013223321177065372,
+     0.013532476034015417,
+     0.013414991088211536,
+     0.013296670280396938,
+     0.012968635652214289,
+     0.014177180361002684,
+     0.013851494062691927
+    ],
+    "median_s": 0.013473733561113477,
+    "mean_s": 0.013575056102126837,
+    "min_s": 0.012968635652214289,
+    "max_s": 0.014177180361002684,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 19.226932682463715,
+   "estimate": {
+    "pure_s": 3113.883989294991,
+    "additive_s": 3157.7967488956638,
+    "ratio_s": 3958.1916620383404
+   }
+  },
+  {
+   "config_id": "KWS|untied|d32|T2|adafactor",
+   "task": "KWS",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 19252,
+   "min_peak_bytes": 269464,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__untied__d32__T2__adafactor__lr0.1__s1",
+   "archived_wall_s": 115.26994785992429,
+   "archived_confirm_wall_s_median": 117.22684257966466,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 24.95471069822088,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.14974836399778724,
+     0.14922818588092923,
+     0.1481082127429545,
+     0.14870091900229454,
+     0.14824492204934359,
+     0.14817836973816156,
+     0.14851208310574293,
+     0.14770710794255137,
+     0.14913682593032718,
+     0.14989223098382354
+    ],
+    "median_s": 0.14860650105401874,
+    "mean_s": 0.14874572213739157,
+    "min_s": 0.14770710794255137,
+    "max_s": 0.14989223098382354,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.007481873966753483,
+     0.0073601980693638325,
+     0.007391252089291811,
+     0.007463600020855665,
+     0.007505783811211586,
+     0.007521709892898798,
+     0.007643462624400854,
+     0.007787866983562708,
+     0.007657325826585293,
+     0.007576991803944111
+    ],
+    "median_s": 0.007513746852055192,
+    "mean_s": 0.007539006508886814,
+    "min_s": 0.0073601980693638325,
+    "max_s": 0.007787866983562708,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 19.777948868928323,
+   "estimate": {
+    "pure_s": 1786.2501426693052,
+    "additive_s": 1811.204853367526,
+    "ratio_s": 2279.8031348976165
+   }
+  },
+  {
+   "config_id": "KWS|two_groups|d32|T8|adafactor",
+   "task": "KWS",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 19252,
+   "min_peak_bytes": 362984,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__two_groups__d32__T8__adafactor__lr0.1__s1",
+   "archived_wall_s": 346.0982770640403,
+   "archived_confirm_wall_s_median": 372.7933967234567,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 1.4434332894161344,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.5544266109354794,
+     0.473350643645972,
+     0.47799825808033347,
+     0.47352767223492265,
+     0.4750896729528904,
+     0.4759830590337515,
+     0.477090572938323,
+     0.4703452382236719,
+     0.4761574361473322,
+     0.47745497804135084
+    ],
+    "median_s": 0.47607024759054184,
+    "mean_s": 0.48314241422340276,
+    "min_s": 0.4703452382236719,
+    "max_s": 0.5544266109354794,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.03630975307896733,
+     0.03756776778027415,
+     0.030335634015500546,
+     0.029321311973035336,
+     0.027435486670583487,
+     0.029580512084066868,
+     0.02802558382973075,
+     0.027654109057039022,
+     0.02712837513536215,
+     0.02689163200557232
+    ],
+    "median_s": 0.028673447901383042,
+    "mean_s": 0.030025016563013197,
+    "min_s": 0.02689163200557232,
+    "max_s": 0.03756776778027415,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 16.603174101276426,
+   "estimate": {
+    "pure_s": 5722.364376038313,
+    "additive_s": 5723.807809327729,
+    "ratio_s": 5746.329950246067
+   }
+  },
+  {
+   "config_id": "KWS|wide_single|d64|T1|adafactor",
+   "task": "KWS",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": false
+   },
+   "lr": 0.1,
+   "n_params": 23344,
+   "min_peak_bytes": 391600,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__wide_single__d64__T1__adafactor__lr0.1__s1",
+   "archived_wall_s": 129.9602644732222,
+   "archived_confirm_wall_s_median": 127.23287745332345,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 36.185496643185616,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": false,
+    "step_seconds": [
+     0.05384619068354368,
+     0.05386784905567765,
+     0.053785678930580616,
+     0.05254639312624931,
+     0.054133894853293896,
+     0.05132648395374417,
+     0.05490931682288647,
+     0.053265636786818504,
+     0.052532550413161516,
+     0.05511268600821495
+    ],
+    "median_s": 0.05381593480706215,
+    "mean_s": 0.053532668063417076,
+    "min_s": 0.05132648395374417,
+    "max_s": 0.05511268600821495,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.0077451979741454124,
+     0.008098490070551634,
+     0.007787881884723902,
+     0.008498945273458958,
+     0.00779891898855567,
+     0.0077977669425308704,
+     0.007804203778505325,
+     0.00763752730563283,
+     0.00834411196410656,
+     0.007920045871287584
+    ],
+    "median_s": 0.0078015613835304976,
+    "mean_s": 0.007943309005349874,
+    "min_s": 0.00763752730563283,
+    "max_s": 0.008498945273458958,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 6.89809797826758,
+   "estimate": {
+    "pure_s": 646.867536380887,
+    "additive_s": 683.0530330240726,
+    "ratio_s": 896.478637617854
+   }
+  },
+  {
+   "config_id": "KWS|untied|d32|T4|adafactor",
+   "task": "KWS",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 37692,
+   "min_peak_bytes": 445416,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__untied__d32__T4__adafactor__lr0.1__s1",
+   "archived_wall_s": 215.60567990783602,
+   "archived_confirm_wall_s_median": 216.42025262932293,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 35.08499841578305,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.2651730729267001,
+     0.2613895502872765,
+     0.2631590007804334,
+     0.274322965182364,
+     0.26950093591585755,
+     0.27257887087762356,
+     0.2735895747318864,
+     0.27645534090697765,
+     0.2706846878863871,
+     0.27154229301959276
+    ],
+    "median_s": 0.27111349045298994,
+    "mean_s": 0.2698396292515099,
+    "min_s": 0.2613895502872765,
+    "max_s": 0.27645534090697765,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.01469164714217186,
+     0.014297121204435825,
+     0.014465176034718752,
+     0.01535032270476222,
+     0.014995975885540247,
+     0.014947563875466585,
+     0.015257321763783693,
+     0.015040743164718151,
+     0.015211293008178473,
+     0.015050485264509916
+    ],
+    "median_s": 0.015018359525129199,
+    "mean_s": 0.014930765004828572,
+    "min_s": 0.014297121204435825,
+    "max_s": 0.01535032270476222,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 18.05213745212013,
+   "estimate": {
+    "pure_s": 3258.784155244939,
+    "additive_s": 3293.869153660722,
+    "ratio_s": 3892.143369154072
+   }
+  },
+  {
+   "config_id": "KWS|shared|d64|T8|adafactor",
+   "task": "KWS",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 23344,
+   "min_peak_bytes": 596608,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__shared__d64__T8__adafactor__lr0.1__s1",
+   "archived_wall_s": 772.8563706339337,
+   "archived_confirm_wall_s_median": 761.5597157787997,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 62.38726959051564,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.6361178685911,
+     0.56101014604792,
+     0.5449433089233935,
+     0.5524552040733397,
+     0.5421215384267271,
+     0.5474033812060952,
+     0.547215981874615,
+     0.5518206008709967,
+     0.5497379270382226,
+     0.547307476401329
+    ],
+    "median_s": 0.5485706541221589,
+    "mean_s": 0.5580133433453739,
+    "min_s": 0.5421215384267271,
+    "max_s": 0.6361178685911,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.058145802933722734,
+     0.05478701461106539,
+     0.06038969475775957,
+     0.05468275677412748,
+     0.06129970261827111,
+     0.06006868975237012,
+     0.05714800488203764,
+     0.06272976798936725,
+     0.056576672941446304,
+     0.061229866929352283
+    ],
+    "median_s": 0.05910724634304643,
+    "mean_s": 0.05870579741895199,
+    "min_s": 0.05468275677412748,
+    "max_s": 0.06272976798936725,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 9.280937415665864,
+   "estimate": {
+    "pure_s": 6593.81926254835,
+    "additive_s": 6656.206532138865,
+    "ratio_s": 7172.8316071521995
+   }
+  },
+  {
+   "config_id": "KWS|untied|d64|T4|adafactor",
+   "task": "KWS",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.1,
+   "n_params": 88540,
+   "min_peak_bytes": 984424,
+   "epochs": 20,
+   "n_train": 38461,
+   "steps_per_run": 12020,
+   "archived_run": "result/s4/confirm/KWS__untied__d64__T4__adafactor__lr0.1__s1",
+   "archived_wall_s": 416.91127102216706,
+   "archived_confirm_wall_s_median": 423.06921317614615,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": -87.57880457350984,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.31545754289254546,
+     0.30970974592491984,
+     0.3114895159378648,
+     0.38959713373333216,
+     0.4296090668067336,
+     0.4101344831287861,
+     0.40157050220295787,
+     0.3814650699496269,
+     0.38031147327274084,
+     0.3804726949892938
+    ],
+    "median_s": 0.38096888246946037,
+    "mean_s": 0.37098172288388015,
+    "min_s": 0.30970974592491984,
+    "max_s": 0.4296090668067336,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.05137469992041588,
+     0.04958355613052845,
+     0.04107235884293914,
+     0.041722557973116636,
+     0.03926311992108822,
+     0.042789454106241465,
+     0.03615270694717765,
+     0.04221921833232045,
+     0.03773243771865964,
+     0.052732032258063555
+    ],
+    "median_s": 0.041970888152718544,
+    "mean_s": 0.04346421421505511,
+    "min_s": 0.03615270694717765,
+    "max_s": 0.052732032258063555,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 9.07697928819703,
+   "estimate": {
+    "pure_s": 4579.245967282914,
+    "additive_s": 4491.667162709404,
+    "ratio_s": 3784.2949720841093
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d24|T2|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 12266,
+   "min_peak_bytes": 247768,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d24__T2__adafactor__lr0.01__s1",
+   "archived_wall_s": 193.904126053676,
+   "archived_confirm_wall_s_median": 200.43439254793338,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 41.49398914538324,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.15005383174866438,
+     0.1483660191297531,
+     0.1472169361077249,
+     0.14957970613613725,
+     0.1468820720911026,
+     0.1480034296400845,
+     0.15581373404711485,
+     0.14730068808421493,
+     0.14822222478687763,
+     0.14914679899811745
+    ],
+    "median_s": 0.14829412195831537,
+    "mean_s": 0.14905854407697916,
+    "min_s": 0.1468820720911026,
+    "max_s": 0.15581373404711485,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.007727875839918852,
+     0.007311150897294283,
+     0.007152942940592766,
+     0.007174674887210131,
+     0.007216628175228834,
+     0.00723534170538187,
+     0.007194423116743565,
+     0.007225101348012686,
+     0.007135407999157906,
+     0.007216149941086769
+    ],
+    "median_s": 0.007216389058157802,
+    "mean_s": 0.007258969685062766,
+    "min_s": 0.007135407999157906,
+    "max_s": 0.007727875839918852,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 20.54962956725228,
+   "estimate": {
+    "pure_s": 3131.9718557596207,
+    "additive_s": 3173.465844905004,
+    "ratio_s": 3984.657961964833
+   }
+  },
+  {
+   "config_id": "CIFAR10|wide_single|d32|T1|adafactor",
+   "task": "CIFAR10",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": false
+   },
+   "lr": 0.03,
+   "n_params": 14602,
+   "min_peak_bytes": 249144,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__wide_single__d32__T1__adafactor__lr0.03__s1",
+   "archived_wall_s": 150.9377233791165,
+   "archived_confirm_wall_s_median": 149.18377917842008,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 39.5996853816323,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": false,
+    "step_seconds": [
+     0.04701097076758742,
+     0.04749943967908621,
+     0.047369600273668766,
+     0.046784688252955675,
+     0.04742231871932745,
+     0.04749476397410035,
+     0.04721510969102383,
+     0.04746441124007106,
+     0.05076594464480877,
+     0.04799165576696396
+    ],
+    "median_s": 0.047443364979699254,
+    "mean_s": 0.04770189030095935,
+    "min_s": 0.046784688252955675,
+    "max_s": 0.05076594464480877,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.005243763327598572,
+     0.005142607260495424,
+     0.0052789016626775265,
+     0.005263041704893112,
+     0.005335893016308546,
+     0.005264473147690296,
+     0.005245482083410025,
+     0.005720312707126141,
+     0.005354645662009716,
+     0.005323172081261873
+    ],
+    "median_s": 0.005271687405183911,
+    "mean_s": 0.005317229265347123,
+    "min_s": 0.005142607260495424,
+    "max_s": 0.005720312707126141,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 8.999654443289987,
+   "estimate": {
+    "pure_s": 1002.0038683712482,
+    "additive_s": 1041.6035537528805,
+    "ratio_s": 1358.387352868941
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d32|T2|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 14602,
+   "min_peak_bytes": 304632,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d32__T2__adafactor__lr0.01__s1",
+   "archived_wall_s": 237.5426689167507,
+   "archived_confirm_wall_s_median": 245.96776480833068,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 47.28283364372328,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.15327186835929751,
+     0.16949272388592362,
+     0.1534006418660283,
+     0.15202118922024965,
+     0.1514875590801239,
+     0.15328952204436064,
+     0.15164329297840595,
+     0.1533762812614441,
+     0.15106049040332437,
+     0.15334943123161793
+    ],
+    "median_s": 0.15328069520182908,
+    "mean_s": 0.1542393000330776,
+    "min_s": 0.15106049040332437,
+    "max_s": 0.16949272388592362,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.010771500878036022,
+     0.009576277807354927,
+     0.008683910127729177,
+     0.009463523048907518,
+     0.008560130838304758,
+     0.008950572926551104,
+     0.008581920992583036,
+     0.00906645692884922,
+     0.00954397115856409,
+     0.008677552919834852
+    ],
+    "median_s": 0.009008514927700162,
+    "mean_s": 0.009187581762671471,
+    "min_s": 0.008560130838304758,
+    "max_s": 0.010771500878036022,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 17.015090326431977,
+   "estimate": {
+    "pure_s": 3237.28828266263,
+    "additive_s": 3284.5711163063534,
+    "ratio_s": 4041.8099680002383
+   }
+  },
+  {
+   "config_id": "CIFAR10|untied|d24|T2|adafactor",
+   "task": "CIFAR10",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.03,
+   "n_params": 23058,
+   "min_peak_bytes": 304968,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__untied__d24__T2__adafactor__lr0.03__s1",
+   "archived_wall_s": 216.7614073161967,
+   "archived_confirm_wall_s_median": 211.14514798112214,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 46.60616046236828,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.15227525122463703,
+     0.15043810615316033,
+     0.15042391931638122,
+     0.15383178181946278,
+     0.15347089106217027,
+     0.15063507435843349,
+     0.15024434914812446,
+     0.15209744591265917,
+     0.1496969503350556,
+     0.1501115127466619
+    ],
+    "median_s": 0.1505365902557969,
+    "mean_s": 0.1513225282076746,
+    "min_s": 0.1496969503350556,
+    "max_s": 0.15383178181946278,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.007723113987594843,
+     0.010611174162477255,
+     0.010154305957257748,
+     0.007830298040062189,
+     0.007788908202201128,
+     0.007863196078687906,
+     0.011395084671676159,
+     0.00837740208953619,
+     0.008213469292968512,
+     0.007899716962128878
+    ],
+    "median_s": 0.008056593127548695,
+    "mean_s": 0.008785666944459081,
+    "min_s": 0.007723113987594843,
+    "max_s": 0.011395084671676159,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 18.684894206839424,
+   "estimate": {
+    "pure_s": 3179.3327862024307,
+    "additive_s": 3225.938946664799,
+    "ratio_s": 4050.1639638287647
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d32|T4|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 14602,
+   "min_peak_bytes": 331128,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d32__T4__adafactor__lr0.01__s1",
+   "archived_wall_s": 415.97551740985364,
+   "archived_confirm_wall_s_median": 429.4191082196776,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": -149.17263067979366,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.26704823691397905,
+     0.267600079998374,
+     0.2652028198353946,
+     0.3005831711925566,
+     0.2657305379398167,
+     0.2687469110824168,
+     0.327866371255368,
+     0.3678698851726949,
+     0.3988501890562475,
+     0.39736886927857995
+    ],
+    "median_s": 0.2846650411374867,
+    "mean_s": 0.3126867071725428,
+    "min_s": 0.2652028198353946,
+    "max_s": 0.3988501890562475,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.027220752090215683,
+     0.02637864276766777,
+     0.027039104141294956,
+     0.024400206748396158,
+     0.026478712912648916,
+     0.027500239200890064,
+     0.027405410073697567,
+     0.027767620980739594,
+     0.025126191787421703,
+     0.02529833372682333
+    ],
+    "median_s": 0.026758908526971936,
+    "mean_s": 0.026461521442979575,
+    "min_s": 0.024400206748396158,
+    "max_s": 0.027767620980739594,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 10.638140970905276,
+   "estimate": {
+    "pure_s": 6012.125668823719,
+    "additive_s": 5862.953038143925,
+    "ratio_s": 4425.206194651285
+   }
+  },
+  {
+   "config_id": "CIFAR10|untied|d32|T2|adafactor",
+   "task": "CIFAR10",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.03,
+   "n_params": 27242,
+   "min_peak_bytes": 371688,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__untied__d32__T2__adafactor__lr0.03__s1",
+   "archived_wall_s": 249.98929757997394,
+   "archived_confirm_wall_s_median": 263.5687183397822,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 52.99978245422244,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.15531944623216987,
+     0.15415849909186363,
+     0.15417801309376955,
+     0.156110106036067,
+     0.15366211766377091,
+     0.15405745385214686,
+     0.15387263102456927,
+     0.15746078314259648,
+     0.15600005025044084,
+     0.15710103698074818
+    ],
+    "median_s": 0.1547487296629697,
+    "mean_s": 0.15519201373681427,
+    "min_s": 0.15366211766377091,
+    "max_s": 0.15746078314259648,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.009435192216187716,
+     0.00929931364953518,
+     0.009322689846158028,
+     0.009312990121543407,
+     0.009333812166005373,
+     0.009331620298326015,
+     0.009262519888579845,
+     0.009429338853806257,
+     0.00943841366097331,
+     0.009154131170362234
+    ],
+    "median_s": 0.009327155072242022,
+    "mean_s": 0.009332002187147737,
+    "min_s": 0.009154131170362234,
+    "max_s": 0.00943841366097331,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 16.591203691199258,
+   "estimate": {
+    "pure_s": 3268.2931704819202,
+    "additive_s": 3321.2929529361427,
+    "ratio_s": 4147.623356769173
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d48|T4|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 20810,
+   "min_peak_bytes": 474552,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d48__T4__adafactor__lr0.01__s1",
+   "archived_wall_s": 639.629127393011,
+   "archived_confirm_wall_s_median": 631.7828810159117,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 47.08041043067351,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.2832651040516794,
+     0.2843356397934258,
+     0.2868868950754404,
+     0.28479154128581285,
+     0.28730153292417526,
+     0.3068012078292668,
+     0.2859721160493791,
+     0.28701685182750225,
+     0.2871240987442434,
+     0.28702143114060163
+    ],
+    "median_s": 0.28695187345147133,
+    "mean_s": 0.2880516418721527,
+    "min_s": 0.2832651040516794,
+    "max_s": 0.3068012078292668,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.026590112131088972,
+     0.028448155149817467,
+     0.02993468614295125,
+     0.029822726268321276,
+     0.028385052923113108,
+     0.028141692746430635,
+     0.027496136259287596,
+     0.027970875147730112,
+     0.026651174295693636,
+     0.027452518697828054
+    ],
+    "median_s": 0.028056283947080374,
+    "mean_s": 0.02808931297622621,
+    "min_s": 0.026590112131088972,
+    "max_s": 0.02993468614295125,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 10.22772203163892,
+   "estimate": {
+    "pure_s": 6060.4235672950745,
+    "additive_s": 6107.503977725748,
+    "ratio_s": 6541.948918315477
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d64|T4|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 29066,
+   "min_peak_bytes": 646648,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d64__T4__adafactor__lr0.01__s1",
+   "archived_wall_s": 899.1415110062808,
+   "archived_confirm_wall_s_median": 880.6222085019108,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 74.49095009081066,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.310368285048753,
+     0.31037651700899005,
+     0.31058888928964734,
+     0.3087801611982286,
+     0.3123205127194524,
+     0.3099932339973748,
+     0.3124077091924846,
+     0.3149898177944124,
+     0.3122946750372648,
+     0.3115360392257571
+    ],
+    "median_s": 0.31106246425770223,
+    "mean_s": 0.3113655840512365,
+    "min_s": 0.3087801611982286,
+    "max_s": 0.3149898177944124,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.0393812358379364,
+     0.04040910489857197,
+     0.03825652273371816,
+     0.04109269380569458,
+     0.0367994518019259,
+     0.03866621619090438,
+     0.03809925401583314,
+     0.038710673339664936,
+     0.03940986189991236,
+     0.04167229309678078
+    ],
+    "median_s": 0.03904595458880067,
+    "mean_s": 0.03924973076209426,
+    "min_s": 0.0367994518019259,
+    "max_s": 0.04167229309678078,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 7.966573426967067,
+   "estimate": {
+    "pure_s": 6569.639245122671,
+    "additive_s": 6644.130195213482,
+    "ratio_s": 7163.076868665653
+   }
+  },
+  {
+   "config_id": "CIFAR10|untied|d48|T2|adafactor",
+   "task": "CIFAR10",
+   "class": "untied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.03,
+   "n_params": 38682,
+   "min_peak_bytes": 532776,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__untied__d48__T2__adafactor__lr0.03__s1",
+   "archived_wall_s": 358.833848006092,
+   "archived_confirm_wall_s_median": 370.7500356321689,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 48.92985067423433,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.16317470790818334,
+     0.1655343361198902,
+     0.16386769711971283,
+     0.16445391811430454,
+     0.16600412782281637,
+     0.16407483024522662,
+     0.1655832719989121,
+     0.1687543368898332,
+     0.16813736222684383,
+     0.1657599019818008
+    ],
+    "median_s": 0.16555880405940115,
+    "mean_s": 0.16553444904275239,
+    "min_s": 0.16317470790818334,
+    "max_s": 0.1687543368898332,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.014417505823075771,
+     0.015016061253845692,
+     0.014752936083823442,
+     0.014654251281172037,
+     0.014692718163132668,
+     0.014472871087491512,
+     0.0148348449729383,
+     0.014836729969829321,
+     0.013898031786084175,
+     0.014043075032532215
+    ],
+    "median_s": 0.014673484722152352,
+    "mean_s": 0.014561902545392514,
+    "min_s": 0.013898031786084175,
+    "max_s": 0.015016061253845692,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 11.28285524497527,
+   "estimate": {
+    "pure_s": 3496.6019417345524,
+    "additive_s": 3545.5317924087867,
+    "ratio_s": 4048.6703640501937
+   }
+  },
+  {
+   "config_id": "CIFAR10|shared|d64|T8|adafactor",
+   "task": "CIFAR10",
+   "class": "tied",
+   "argmin_knob": {
+    "microbatch": 1,
+    "checkpointing": true
+   },
+   "lr": 0.01,
+   "n_params": 29066,
+   "min_peak_bytes": 732408,
+   "epochs": 30,
+   "n_train": 45000,
+   "steps_per_run": 21120,
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d64__T8__adafactor__lr0.01__s1",
+   "archived_wall_s": 1650.8115868298337,
+   "archived_confirm_wall_s_median": 1672.305249030469,
+   "archived_confirm_runs": 12,
+   "archived_overhead_s": 39.3209324805066,
+   "feasible": {
+    "microbatch": 1,
+    "checkpointing": true,
+    "step_seconds": [
+     0.6426010872237384,
+     0.5722163473255932,
+     0.581466251052916,
+     0.5780180832371116,
+     0.5789824328385293,
+     0.5765109779313207,
+     0.5763677009381354,
+     0.57255137572065,
+     0.57617959799245,
+     0.5766834681853652
+    ],
+    "median_s": 0.5765972230583429,
+    "mean_s": 0.583157732244581,
+    "min_s": 0.5722163473255932,
+    "max_s": 0.6426010872237384,
+    "all_losses_finite": true
+   },
+   "m64": {
+    "microbatch": 64,
+    "checkpointing": false,
+    "step_seconds": [
+     0.07607043161988258,
+     0.07849406311288476,
+     0.08082355326041579,
+     0.07735063694417477,
+     0.07004717877134681,
+     0.07637701788917184,
+     0.07622626377269626,
+     0.07407847419381142,
+     0.07396298693493009,
+     0.07881184294819832
+    ],
+    "median_s": 0.07630164083093405,
+    "mean_s": 0.07622424494475126,
+    "min_s": 0.07004717877134681,
+    "max_s": 0.08082355326041579,
+    "all_losses_finite": true
+   },
+   "slowdown_t1_over_t64": 7.556812891297354,
+   "estimate": {
+    "pure_s": 12177.733350992203,
+    "additive_s": 12217.05428347271,
+    "ratio_s": 12474.874280458727
+   }
+  }
+ ],
+ "totals": {
+  "i_22_runs_seed1__pure": {
+   "runs": 22,
+   "core_hours": 22.022933278421664,
+   "wall_hours_lpt": 3.382703708608945,
+   "wall_hours_lower_bound": 3.382703708608945,
+   "longest_run_hours": 3.382703708608945
+  },
+  "ii_66_runs_seeds1to3__pure": {
+   "runs": 66,
+   "core_hours": 66.068799835265,
+   "wall_hours_lpt": 9.459770643713677,
+   "wall_hours_lower_bound": 9.438399976466428,
+   "longest_run_hours": 3.382703708608945
+  },
+  "i_22_runs_seed1__additive": {
+   "runs": 22,
+   "core_hours": 22.150822682591905,
+   "wall_hours_lpt": 3.3936261898535305,
+   "wall_hours_lower_bound": 3.3936261898535305,
+   "longest_run_hours": 3.3936261898535305
+  },
+  "ii_66_runs_seeds1to3__additive": {
+   "runs": 66,
+   "core_hours": 66.45246804777571,
+   "wall_hours_lpt": 9.51263250427269,
+   "wall_hours_lower_bound": 9.493209721110816,
+   "longest_run_hours": 3.3936261898535305
+  },
+  "i_22_runs_seed1__ratio": {
+   "runs": 22,
+   "core_hours": 24.05292662394178,
+   "wall_hours_lpt": 3.5208216775799275,
+   "wall_hours_lower_bound": 3.46524285568298,
+   "longest_run_hours": 3.46524285568298
+  },
+  "ii_66_runs_seeds1to3__ratio": {
+   "runs": 66,
+   "core_hours": 72.15877987182535,
+   "wall_hours_lpt": 10.319461992114597,
+   "wall_hours_lower_bound": 10.308397124546477,
+   "longest_run_hours": 3.46524285568298
+  }
+ }
+}

@@ -15,7 +15,9 @@ showed a tied accuracy advantage larger than its preregistered floor, so the acc
 the frozen rule; the accounting predicted all 744 measured peaks exactly. Accuracy was measured at microbatch 64,
 where every selected configuration exceeds its cap; the caps are met at each configuration's memory-minimal setting
 (microbatch 1, with checkpointing for most), and the two settings are assumed to train the same model up to
-floating-point reordering (see Limitations). "Preregistered" means frozen with a SHA-256 hash in this project's
+floating-point reordering. An exploratory check, specified before it ran, retrained the 22 selected configurations at
+their memory-minimal settings with three seeds: mean test accuracy changed by −0.07 points (90% interval −0.15 to
++0.01), inside the ±0.5-point margin fixed in advance. "Preregistered" means frozen with a SHA-256 hash in this project's
 version history before any confirmatory run; nothing was deposited with a third party. The scope is one model family,
 three small tasks and CPU tensor bytes, not device memory.
 
@@ -62,6 +64,28 @@ distinct-parameter configurations (Table 2, `research/s8/tables/table2_20261014T
 Feasibility: tying enlarged the feasible set at 20 of 21 caps (the exception is CIFAR-10 at 256 KiB, 2 tied against
 5 distinct-parameter configurations).
 
+## Exploratory check: training at the cap-respecting setting
+
+Outside the frozen protocol, and without changing its verdict: the 22 configurations selected in the 21 finite-cap
+cells were trained again with seeds 1–3 at their memory-minimal settings (microbatch 1; checkpointing for 18 of the
+22), and each run was compared with the archived microbatch-64 run of the same configuration and seed. The plan
+(`research/s9/TRANSFER_PLAN_v1.md`, design, readouts, decision rule and ±0.5-point margin), the analysis script and
+the launch files were frozen by hash before any run. Two archived runs (Speech Commands and CIFAR-10) were first
+repeated at microbatch 64 with the CPU build of torch 2.10.0 and matched bit for bit
+(`research/s9/precondE_20261014T080923Z.json`).
+
+- Mean change in test accuracy over the 22 configurations: −0.07 points, 90% interval −0.15 to +0.01, inside the
+  margin (verdict SUPPORTED). By task: UCI-HAR −0.41 (3 configurations), Speech Commands −0.04 (9), CIFAR-10 +0.01
+  (10).
+- Single-run changes averaged 0.40 times the seed-to-seed standard deviation; 18 of the 30 CIFAR-10 runs reproduced
+  the archived test accuracy exactly.
+- Per cell, the tied-minus-distinct difference over seeds 1–3 moved by at most 0.63 points; its sign changed only at
+  Speech Commands 512 KiB (−0.29 to +0.22 points).
+- The 66 runs took 68.8 core-hours, about 11 times their microbatch-64 time.
+
+Results: `research/s9/transfer_analysis_20261014T180351Z.json`; run records: `result/s9/transfer/` and
+`result/s9/transfer_env/`.
+
 ## What is measured
 
 The memory quantity is the peak requested PyTorch CPU tensor bytes of one training update (zero_grad, forward,
@@ -83,7 +107,9 @@ does not include the allocator's cached or fragmented bytes, the Python interpre
   microbatch 1, with checkpointing in 28 of the 42. The two settings are assumed to train the same model up to
   floating-point reordering. This was checked over three updates (exact agreement in float64, identical
   checkpointed gradients in fp32, and fp32 accumulation differences no larger than those of a pure reordering of the
-  examples), not over full training runs.
+  examples), and in the exploratory check above by full training runs of the 22 selected configurations at their
+  memory-minimal settings (seeds 1–3). The selection runs (one seed for each of the 744 configurations) were not
+  repeated at the memory-minimal settings.
 - Speech Commands silence: the training and validation silence clips are crops of the same six background
   recordings (all 463 validation silence clips overlap a training crop); the origin of the 408 official test silence
   clips relative to those recordings was not checked.
@@ -103,6 +129,7 @@ does not include the allocator's cached or fragmented bytes, the Python interpre
 | `research/s3/` | Data manifest; `v4/`: learning-rate selection, floors, accounting calibration and predictions, code-freeze records, launcher specs. |
 | `research/s4/` | Judge inputs and outputs (first look and final look), cell selection, profile summary and manifest, launcher specs. |
 | `research/s8/` | Table 1, Table 2 and derived-number scripts and their outputs (derived numbers of 2026-10-11 and of the 2026-10-14 revision). |
+| `research/s9/`, `result/s9/` | Exploratory transfer check: plan (frozen, with `.sha256`), launch specs, analysis and environment-check scripts, their outputs, the cost probe, and the run records of the 66 transfer runs and the 2 environment reruns. |
 | `data/KWS/*_meta.json` | Clip lists of the prepared Speech Commands splits (source file, speaker, silence crop offset), as written by `prepare_data.py`; read by `derived_numbers.py` for the silence overlap. The audio is not redistributed. |
 | `result/s3/v4/`, `result/s4/` | Run records (`result.json`, `DONE.json`, launcher exit records) of the learning-rate, floor, bar, selection and confirmation runs. |
 | `result/s3/{lrcal,floor,bars}/` | Runs under protocol version 3, superseded by version 4 and kept as records. |
@@ -234,9 +261,29 @@ until the matching `result/` folders are moved aside. Selection and confirmation
 `research/s3/v4/` and stop if a frozen source file has changed. The module docstrings give the exact rules of every
 step.
 
+**(i) Exploratory transfer check.** Reproduce the analysis from the shipped records (numpy and scipy suffice):
+
+```
+python research/s9/transfer_analysis.py --design seeds123 --comparator archived --out rerun/transfer_analysis.json
+python -c "import json; a=json.load(open('rerun/transfer_analysis.json')); b=json.load(open('research/s9/transfer_analysis_20261014T180351Z.json')); print(all(a[k]==b[k] for k in ('precondition_E','R1','R2','R3','R4','cost','runs')))"
+python -m unittest research/s9/test_transfer_analysis.py
+```
+
+The comparison prints `True`. Repeating one transfer run needs the full environment and the prepared data, for
+example:
+
+```
+CUDA_VISIBLE_DEVICES="" OMP_NUM_THREADS=1 PYTHONPATH=src python -m lb.train --config-id "HAR|untied|d24|T2|adafactor" --lr 0.1 --seed 1 --mode confirm --microbatch 1 --checkpointing --out rerun/transfer_one
+```
+
+The 66 runs were launched with `python -m lb.launch --specs research/s9/transfer_specs_seeds123.jsonl --jobs 7`, after
+`research/s9/transfer_specs_precondE.jsonl` (the two environment reruns).
+
 ## Changes in release 1.1 (2026-10-14)
 
 Added after two external reviews of the manuscript. No frozen file, run record or number of release 1.0 changed.
+
+- The exploratory transfer check (section above): `research/s9/` and `result/s9/`.
 
 - `research/s8/derived_numbers.py`: sections 13–24, written to `research/s8/derived_numbers_20261014T073724Z.json`
   (boundary-pair base rate and false fits, static-estimate ratios by class, persistent shares, structure of the

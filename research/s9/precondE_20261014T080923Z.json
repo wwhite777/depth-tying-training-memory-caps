@@ -1,0 +1,80 @@
+{
+ "kind": "precondition E (TRANSFER_PLAN_v1.md)",
+ "written_utc": "2026-10-14T08:09:23Z",
+ "script_sha256": "98d6eb12d526eedbaa55e84486b2b4b603a750041696d99bd0a39e05b177cbc1",
+ "fields": [
+  "test_acc",
+  "final_val_acc",
+  "train_loss_per_epoch",
+  "val_acc_per_epoch",
+  "steps",
+  "status"
+ ],
+ "pairs": [
+  {
+   "env_run": "result/s9/transfer_env/CIFAR10__shared__d24__T2__adafactor__lr0.01__s1",
+   "archived_run": "result/s4/confirm/CIFAR10__shared__d24__T2__adafactor__lr0.01__s1",
+   "finished": true,
+   "identical": true,
+   "fields_equal": {
+    "test_acc": true,
+    "final_val_acc": true,
+    "train_loss_per_epoch": true,
+    "val_acc_per_epoch": true,
+    "steps": true,
+    "status": true
+   },
+   "knob_m64_nockpt": true,
+   "same_config_seed_lr_mode": true,
+   "test_acc": [
+    61.0,
+    61.0
+   ],
+   "torch": [
+    "2.10.0+cpu",
+    "2.10.0+cu128"
+   ],
+   "wall_seconds": [
+    173.13826183136553,
+    193.904126053676
+   ],
+   "sha256": {
+    "env": "2951709fadde4410ce55ea0b1eb0964e7399f902764df34f2dc8f873390b249c",
+    "archived": "660160708b4f5fc8579760d55dabcde00d5d94280b6c32171ae42e037c7cd514"
+   }
+  },
+  {
+   "env_run": "result/s9/transfer_env/KWS__shared__d32__T2__adafactor__lr0.1__s1",
+   "archived_run": "result/s4/confirm/KWS__shared__d32__T2__adafactor__lr0.1__s1",
+   "finished": true,
+   "identical": true,
+   "fields_equal": {
+    "test_acc": true,
+    "final_val_acc": true,
+    "train_loss_per_epoch": true,
+    "val_acc_per_epoch": true,
+    "steps": true,
+    "status": true
+   },
+   "knob_m64_nockpt": true,
+   "same_config_seed_lr_mode": true,
+   "test_acc": [
+    90.22494887525562,
+    90.22494887525562
+   ],
+   "torch": [
+    "2.10.0+cpu",
+    "2.10.0+cu128"
+   ],
+   "wall_seconds": [
+    104.15547178918496,
+    115.53227512305602
+   ],
+   "sha256": {
+    "env": "f946a6691fb1d1bb784151ea8635977651db104ec9023412fe78e90b83d66671",
+    "archived": "0cac2b888464f4469fd513f17f99e2f480be9c89c34cd56656af0c4e9dd3002b"
+   }
+  }
+ ],
+ "all_identical": true
+}
