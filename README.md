@@ -57,9 +57,10 @@ criteria.
   rejected none of the 500 that fit; their accuracy of about 54% is close to the share of boundary pairs that fit
   (500 of 928, 53.9%).
 
-Descriptive, outside the frozen protocol: in the selected depth-tied configurations, the persistent state that tying
-shrinks (weights, gradients and optimizer state) is 32–51% of the measured peak, against 49–74% in the selected
-distinct-parameter configurations (Table 2, `research/s8/tables/table2_20261014T071724Z.md`).
+Descriptive, outside the frozen protocol: in the selected depth-tied configurations, weights, gradients and optimizer
+state (the persistent state) make up 32–51% of the measured peak, against 49–74% in the selected distinct-parameter
+configurations (Table 2, `research/s8/tables/table2_20261014T071724Z.md`). The split does not show how tying
+changes the rest of the peak (inputs, saved activations and transients); it describes the selections only.
 
 Feasibility: tying enlarged the feasible set at 20 of 21 caps (the exception is CIFAR-10 at 256 KiB, 2 tied against
 5 distinct-parameter configurations).
@@ -266,7 +267,7 @@ step.
 ```
 python research/s9/transfer_analysis.py --design seeds123 --comparator archived --out rerun/transfer_analysis.json
 python -c "import json; a=json.load(open('rerun/transfer_analysis.json')); b=json.load(open('research/s9/transfer_analysis_20261014T180351Z.json')); print(all(a[k]==b[k] for k in ('precondition_E','R1','R2','R3','R4','cost','runs')))"
-python -m unittest research/s9/test_transfer_analysis.py
+python -m unittest research/s9/test_transfer_analysis.py research/s9/test_transfer_analysis_oracle.py
 ```
 
 The comparison prints `True`. Repeating one transfer run needs the full environment and the prepared data, for
@@ -283,7 +284,8 @@ The 66 runs were launched with `python -m lb.launch --specs research/s9/transfer
 
 Added after two external reviews of the manuscript. No frozen file, run record or number of release 1.0 changed.
 
-- The exploratory transfer check (section above): `research/s9/` and `result/s9/`.
+- The exploratory transfer check (section above): `research/s9/` and `result/s9/`; `test_transfer_analysis_oracle.py`
+  adds regression tests that pin the decision margin and the standard-deviation convention of the analysis.
 
 - `research/s8/derived_numbers.py`: sections 13–24, written to `research/s8/derived_numbers_20261014T073724Z.json`
   (boundary-pair base rate and false fits, static-estimate ratios by class, persistent shares, structure of the
