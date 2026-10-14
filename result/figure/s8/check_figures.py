@@ -23,10 +23,13 @@ SRC = {
     "selection": S4 / "selection.json",
     "n2_input": S4 / "n2_input.json",
     "profile_summary": S4 / "profile_registry_summary.json",
+    "n1_input": S4 / "n1_input_topup.json",  # S9 revision: pins the confirmation run files (fig1_design_v2)
 }
-FIGS = ["fig1_design", "fig2_feasible_counts", "fig3_a1_cells", "fig4_a2_accounting"]
+FIGS = ["fig1_design", "fig2_feasible_counts", "fig3_a1_cells", "fig4_a2_accounting",
+        "fig1_design_v2", "fig4_a2_accounting_v2"]
 # Numbering follows the order of first citation in the manuscript (renumbered 2026-10-11).
-FIG_NUMBER = {"fig1_design": 1, "fig2_feasible_counts": 2, "fig3_a1_cells": 3, "fig4_a2_accounting": 4}
+FIG_NUMBER = {"fig1_design": 1, "fig2_feasible_counts": 2, "fig3_a1_cells": 3, "fig4_a2_accounting": 4,
+              "fig1_design_v2": 1, "fig4_a2_accounting_v2": 4}
 A1_SENTENCE = "Bars run from the mean to the one-sided 95% upper bound."
 A1_ABSENT = "not significance markers"
 TIED = ("shared", "two_groups", "reversible_shared")
@@ -194,6 +197,105 @@ def exp_a2_accounting():
     return cols, rows, ["n2_input", "judge_final"]
 
 
+def run_knobs(pins, mode):
+    """Training (microbatch, checkpointing) values over the pinned result.json files of one mode; hashes checked."""
+    seen, n = set(), 0
+    for rel, digest in pins.items():
+        if rel.endswith("/result.json"):
+            raw = (ROOT / rel).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != digest:
+                fail(f"fig1_design_v2: {rel} differs from its pinned sha256")
+            r = json.loads(raw)
+            if r["mode"] != mode:
+                fail(f"fig1_design_v2: {rel} mode {r['mode']} != {mode}")
+            seen.add((r["microbatch"], r["checkpointing"]))
+            n += 1
+    if len(seen) != 1:
+        fail(f"fig1_design_v2: {mode} runs have training knobs {sorted(seen)}")
+    return sorted(seen)[0], n
+
+
+def exp_design_v2():
+    """S9 revision: the v1 quantities plus the training microbatch / checkpointing of the selection and
+    confirmation runs, read from the result files pinned by selection.json and by n1_input_topup.json
+    (itself pinned by judge_final input_sha256.n1)."""
+    cols, rows, srcs = exp_design()
+    sel, jf, n1 = J("selection"), J("judge_final"), J("n1_input")
+    if sha(SRC["n1_input"]) != jf["input_sha256"]["n1"]:
+        fail("fig1_design_v2: n1_input_topup.json is not the file the final judge pins")
+    (mb_s, ck_s), n_s = run_knobs(sel["inputs_sha256"], "select")
+    (mb_c, ck_c), n_c = run_knobs(n1["_provenance"]["inputs_sha256"], "confirm")
+    if n_s != len(J("n2_input")["configs"]) or n_c != n1["_provenance"]["n_confirm_runs"]:
+        fail(f"fig1_design_v2: {n_s} selection and {n_c} confirmation run files")
+    rows = rows + [["train_microbatch_select", mb_s], ["train_checkpointing_select", ck_s],
+                   ["n_select_runs", n_s], ["train_microbatch_confirm", mb_c],
+                   ["train_checkpointing_confirm", ck_c], ["n_confirm_runs", n_c]]
+    return cols, rows, srcs + ["n1_input"]
+
+
+def exp_a2_accounting_v2():
+    """S9 revision of Figure 4: estimate/measured ratios (with the deterministic jitter), class medians, minima and
+    maxima; false fits and false rejections on the boundary pairs; checked against judge N2.1 and N2.2."""
+    n2, jf = J("n2_input"), J("judge_final")
+    phi = 0.6180339887498949
+    rows = []
+    for bi, b in enumerate(BASE):
+        for ci, cl in enumerate(("tied", "untied")):
+            yc = -(bi * 2.6 + ci * 1.0)
+            sub = [c for c in n2["configs"] if cls(c["config_id"]) == cl]
+            rs = []
+            for k, c in enumerate(sub):
+                r = c["baselines"][b] / c["measured_min_peak_bytes"]
+                rs.append(r)
+                rows.append(["a", "point", b, cl, c["config_id"], c["baselines"][b], c["measured_min_peak_bytes"], r,
+                             yc + 0.6 * ((((k + 1) * phi) % 1.0) - 0.5), "", ""])
+            s_ = sorted(rs)
+            m = len(s_)
+            med = s_[m // 2] if m % 2 else (s_[m // 2 - 1] + s_[m // 2]) / 2
+            rows += [["a", "median", b, cl, "", "", "", med, yc, "", m], ["a", "min", b, cl, "", "", "", s_[0], "", "", m],
+                     ["a", "max", b, cl, "", "", "", s_[-1], "", "", m]]
+            if not s_[-1] < 1.0:
+                fail(f"fig4_a2_accounting_v2: {b} {cl} has a ratio >= 1")
+    exact = sum(c["measured_min_peak_bytes"] == c["predicted_min_peak_bytes"] for c in n2["configs"])
+    rows.append(["a", "accounting_exact", "accounting", "", "", "", "", 1.0, "", exact, len(n2["configs"])])
+    meth = (*BASE, "accounting")
+    false_fit = dict.fromkeys(meth, 0)
+    false_rej = dict.fromkeys(meth, 0)
+    n_fit = n_not = 0
+    for c in n2["configs"]:
+        m = c["measured_min_peak_bytes"]
+        est = dict(c["baselines"], accounting=c["predicted_min_peak_bytes"])
+        for cap in n2["caps_kib"]:
+            B = cap * 1024
+            if abs(m - B) <= 0.20 * B:
+                if m <= B:
+                    n_fit += 1
+                    for k in meth:
+                        false_rej[k] += est[k] > B
+                else:
+                    n_not += 1
+                    for k in meth:
+                        false_fit[k] += est[k] <= B
+    rows += [["b", "false_fit", k, "", "", "", "", "", "", false_fit[k], n_not] for k in meth]
+    rows += [["b", "false_reject", k, "", "", "", "", "", "", false_rej[k], n_fit] for k in meth]
+    # agreement with the frozen judge and with the counts named by the S9 card
+    if not (n_fit + n_not == jf["n2_1"]["n_boundary_pairs"] == 928 and n_fit == 500 and n_not == 428):
+        fail(f"fig4_a2_accounting_v2: boundary pairs {n_fit} fit + {n_not} not fit")
+    if not (exact == jf["n2_1"]["n_configs"] == 744 and jf["n2_1"]["max_rel_err"] == 0.0
+            and false_fit["accounting"] == false_rej["accounting"] == 0 and jf["n2_1"]["n_boundary_right"] == 928):
+        fail("fig4_a2_accounting_v2: accounting disagrees with judge n2_1")
+    for comp in jf["n2_2"]["comparisons"]:
+        k = comp["baseline"]
+        if not (false_fit[k] + false_rej[k] == comp["b"] and comp["c"] == 0 and false_rej[k] == 0):
+            fail(f"fig4_a2_accounting_v2: {k} disagrees with judge n2_2 (b {comp['b']}, c {comp['c']})")
+    log(f"info fig4_a2_accounting_v2: pairs {n_fit + n_not} (fit {n_fit}, not fit {n_not}); false fits "
+        + ", ".join(f"{k} {false_fit[k]}" for k in meth) + "; false rejections "
+        + ", ".join(f"{k} {false_rej[k]}" for k in meth) + f"; exact {exact}/{len(n2['configs'])}")
+    cols = ["panel", "row", "method", "class", "config_id", "estimate_bytes", "measured_min_peak_bytes", "value",
+            "y_position", "count", "n"]
+    return cols, rows, ["n2_input", "judge_final"]
+
+
 def exp_feasible_counts():
     sel = J("selection")
     order = sel["caps_kib"] + ["unbounded"]
@@ -281,7 +383,8 @@ def main():
     for k, p in SRC.items():
         log(f"src  {k}: {p.relative_to(ROOT)} sha256 {sha(p)}")
     expect = {"fig1_design": exp_design, "fig2_feasible_counts": exp_feasible_counts,
-              "fig3_a1_cells": exp_a1_cells, "fig4_a2_accounting": exp_a2_accounting}
+              "fig3_a1_cells": exp_a1_cells, "fig4_a2_accounting": exp_a2_accounting,
+              "fig1_design_v2": exp_design_v2, "fig4_a2_accounting_v2": exp_a2_accounting_v2}
     for name in FIGS:
         for ext in ("pdf", "png", "csv", "pptx"):
             if not (d / f"{name}.{ext}").is_file():

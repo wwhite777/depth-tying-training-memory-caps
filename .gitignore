@@ -1,7 +1,10 @@
 __pycache__/
 *.pyc
 # datasets (downloaded and built by src/lb/prepare_data.py)
-data/
+data/*
+!data/KWS/
+data/KWS/*
+!data/KWS/*_meta.json
 # memory profiles extracted from the .tar.xz archives
 result/s4/profile_registry/
 result/s3/v4/calib_profiles/

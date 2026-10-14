@@ -1,0 +1,31 @@
+# Figure 1. Study design. Two parameter classes form a registry of configurations per task. Each configuration's minimum-over-knobs peak of requested PyTorch CPU tensor bytes decides feasibility under seven caps and an unbounded control. Within each class the best feasible configuration on validation (seed 0) is selected per task and cap and confirmed on test (seeds 1–10, plus one top-up of seeds 11–12); the frozen judge compares the difference with preregistered floors (A1). In parallel, a lifetime-aware accounting predicts each configuration's peak before any registry measurement (A2). Selection and confirmation runs are trained at microbatch 64 without checkpointing; feasibility uses each configuration's minimum-over-knobs peak. Drawn by a Python script (matplotlib 3.11.2) written with Anthropic's Claude Opus 5.5 (model identifier claude-opus-5-5).
+# quantities shown in the schematic, read from the frozen sources
+# source: research/s4/n2_input.json sha256 f240c26497a8a79a4f14cd565a9046ea897655cb020e938d2612b4e6b9fcc515
+# source: research/s4/selection.json sha256 c50acf65dbe9e1b2f4416903c5f50fb71b99126803f8dc6d7b7f7cec13402904
+# source: research/s4/profile_registry_summary.json sha256 429bc046221d1b33b2aeda2c4da96f63d8312dedaf41a95882441b7e117cb94c
+# source: research/s4/judge_final_20261011T054347Z.json sha256 e0bc089578fbff704af37098269b2caa334bc12ff65094c7eacec242476e35b1
+# source: research/s4/judge_20261011T045319Z.json sha256 ed6375cf8b3f837dbe0886ad345fef847b66f31803fe0199aa64b173263d6d45
+# source: research/s4/n1_input_topup.json sha256 a329cdc8e657f747c6380d06b786e524953dbddc0d0fbc601c87577bdb7ea0a6
+quantity,value
+n_tasks,3
+tasks,HAR;KWS;CIFAR10
+configs_per_task,248
+configs_total,744
+tied_per_task,128
+untied_per_task,120
+caps_kib,256;323;406;512;645;813;1024
+control_cap,unbounded
+microbatch_min,1
+microbatch_max,64
+checkpointing_values,False;True
+selection_seeds,0
+confirmation_seeds,1;2;3;4;5;6;7;8;9;10
+topup_seeds,11;12
+holm_family_size,21
+floors,HAR=2.364394057764677;KWS=1.0;CIFAR10=1.3673331708109768
+train_microbatch_select,64
+train_checkpointing_select,False
+n_select_runs,744
+train_microbatch_confirm,64
+train_checkpointing_confirm,False
+n_confirm_runs,300

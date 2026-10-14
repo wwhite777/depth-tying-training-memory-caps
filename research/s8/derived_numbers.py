@@ -1,20 +1,30 @@
 """Derived numbers for the S8 manuscript that the frozen judge does not print, computed from the frozen S3/S4 files.
 
-Run from the project root with the project venv:
-  ~/envs/jeongwoncheol_loopbudget/bin/python research/s8/derived_numbers.py --out research/s8/derived_numbers_<UTC>.json
+Run from the project root (the S8 project venv was deleted on 2026-10-11; numpy, scipy and pyyaml suffice, e.g. the docs venv):
+  ~/envs/jeongwoncheol_loopbudget_docs/bin/python research/s8/derived_numbers.py --out research/s8/derived_numbers_<UTC>.json
+Sections 1-12 are those of derived_numbers_20261011T111328Z.json (unchanged values); sections 13-24 were added on
+2026-10-14 for the revision after two external reviews (boundary-pair base rate and false fits, static-estimate ratios by
+class, persistent shares, structure of the distinct pairs, unadjusted and 14-pair Holm p, margins, 97.5% bounds, knob
+settings and microbatch-64 peaks, Speech Commands silence overlap, fp32 knob-equivalence values, optimizer counts, runs
+before protocol version 4).
 Reads only frozen outputs (no training, no profiling). Exit 0 = written; exit 2 = a source is missing, a hash differs
 from the value recorded in DECISION_LOG.md, or a consistency assertion fails (nothing is written).
 """
 import argparse
+import ast
 import collections
 import datetime
 import glob
 import hashlib
 import json
+import math
 import pathlib
 import re
 import statistics
 import sys
+
+import yaml
+from scipy import stats
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCES = {
@@ -69,6 +79,48 @@ def holm(pvals):
 
 def cells(j):
     return {(c["task"], c["cap_kib"]): c for c in j["n1"]["cells"]}
+
+
+# sections 13-24 (added 2026-10-14, card S9-A): extra sources, each hashed into sources_sha256 when read
+EXTRA = {
+    "registry_summary": ("research/s4/profile_registry_summary.json", None),
+    "prereg_v4": ("PREREGISTERED_loopbudget_v4.yaml", None),
+    "kws_train_meta": ("data/KWS/train_meta.json", None),
+    "kws_val_meta": ("data/KWS/val_meta.json", None),
+    "kws_test_meta": ("data/KWS/test_meta.json", None),
+    "train_test_source": ("test/lb/test_train.py", None),
+}
+TIED_STRUCT = ("shared", "two_groups", "reversible_shared")
+UNTIED_STRUCT = ("untied", "reversible_untied", "wide_single")
+BASE_NAMES = {"B1": "param_count_with_state_multiplier", "B2": "persistent_weights_gradients_optimizer",
+              "B3": "static_four_component_sum"}
+TASKS = ("HAR", "KWS", "CIFAR10")
+
+
+def read_hashed(rel, hashes, want=None):
+    p = ROOT / rel
+    if not p.exists():
+        raise Fail(f"missing source {rel}")
+    b = p.read_bytes()
+    h = hashlib.sha256(b).hexdigest()
+    if want and h != want:
+        raise Fail(f"hash mismatch {rel}: {h} != {want}")
+    hashes[rel] = h
+    return b
+
+
+def cls_of(cid):
+    s = cid.split("|")[1]
+    if s in TIED_STRUCT:
+        return "tied"
+    if s in UNTIED_STRUCT:
+        return "untied"
+    raise Fail(f"unknown structure in {cid}")
+
+
+def mmm(xs):
+    xs = sorted(xs)
+    return {"min": xs[0], "median": statistics.median(xs), "max": xs[-1], "n": len(xs)}
 
 
 def main():
@@ -296,9 +348,333 @@ def main():
         R["compute_hours_by_folder"] = hours
         R["compute_hours_total_records"] = sum(hours.values())
 
+        # ---------------- sections 13-24 (card S9-A, 2026-10-14); sections 1-12 above are unchanged ----------------
+        D = {}  # new key -> short definition (written as the top-level "definitions" field)
+        X = {k: read_hashed(rel, hashes, want) for k, (rel, want) in EXTRA.items()}
+        reg = json.loads(X["registry_summary"])["profiles"]
+        n2cfg = {c["config_id"]: c for c in n2["configs"]}
+        if len(reg) != 744 or set(reg) != set(n2cfg) or any(
+                reg[k]["min_peak_bytes"] != n2cfg[k]["measured_min_peak_bytes"] for k in reg):
+            raise Fail("registry summary and n2_input disagree on the 744 configurations or their minimum peaks")
+
+        def at_argmin(cid):
+            p, ak = reg[cid], reg[cid]["argmin_knob"]
+            hit = [x for x in p["measurements"]
+                   if x["microbatch"] == ak["microbatch"] and x["checkpointing"] == ak["checkpointing"]]
+            if (len(hit) != 1 or hit[0]["peak_bytes"] != p["min_peak_bytes"]
+                    or min(x["peak_bytes"] for x in p["measurements"]) != p["min_peak_bytes"]):
+                raise Fail(f"argmin measurement inconsistent for {cid}")
+            m = hit[0]
+            if m["baseline_bytes"] != m["W_bytes"] + m["G_bytes"] + m["O_bytes"]:
+                raise Fail(f"baseline_bytes != W + G + O for {cid}")
+            return m
+
+        def peak64(cid):
+            hit = [x["peak_bytes"] for x in reg[cid]["measurements"] if x["microbatch"] == 64 and not x["checkpointing"]]
+            if len(hit) != 1:
+                raise Fail(f"no unique microbatch-64 no-checkpointing measurement for {cid}")
+            return hit[0]
+
+        def parse(cid):
+            t, s, d, T, o = cid.split("|")
+            return {"task": t, "structure": s, "d": int(d[1:]), "T": int(T[1:]), "optimizer": o}
+
+        sel_cells = {(c["task"], c["cap_kib"]): c for c in sel["cells"]}
+
+        # 13. boundary pairs (|P - 1024B| <= 0.2 x 1024B, P = measured minimum peak, finite caps): error direction
+        n_fit = sum(1 for c, B in pairs if c["measured_min_peak_bytes"] <= B)
+        R["boundary_fit_base_rate"] = {"n_pairs": len(pairs), "n_fit": n_fit, "n_not_fit": len(pairs) - n_fit,
+                                       "share_fit": n_fit / len(pairs)}
+        D["boundary_fit_base_rate"] = ("boundary pairs (Eq. 6, finite caps) and how many fit by the measured minimum "
+                                       "peak (P <= 1024 x cap); share_fit = n_fit / n_pairs")
+        bd = {}
+        for e in ("B1", "B2", "B3", "accounting"):
+            anf = rf = ok = 0
+            for c, B in pairs:
+                mfit = c["measured_min_peak_bytes"] <= B
+                pfit = (c["predicted_min_peak_bytes"] if e == "accounting" else c["baselines"][BASE_NAMES[e]]) <= B
+                anf += pfit and not mfit
+                rf += (not pfit) and mfit
+                ok += pfit == mfit
+            bd[e] = {"estimator": BASE_NAMES.get(e, "predicted_min_peak_bytes (lifetime-aware accounting)"),
+                     "admitted_not_fit": anf, "rejected_fit": rf, "correct": ok, "accuracy_pct": 100 * ok / len(pairs)}
+        if bd["accounting"]["admitted_not_fit"] or bd["accounting"]["rejected_fit"]:
+            raise Fail("the accounting has boundary errors")
+        for e in ("B1", "B2", "B3"):
+            jb = jn22[BASE_NAMES[e]]
+            if bd[e]["admitted_not_fit"] + bd[e]["rejected_fit"] != jb["b"] or jb["c"] != 0:
+                raise Fail(f"{e} errors disagree with the judge's N2.2 discordant counts")
+        R["boundary_errors_by_estimator"] = bd
+        D["boundary_errors_by_estimator"] = ("per estimator over the boundary pairs: admitted_not_fit = predicted to fit "
+                                             "but the measured peak exceeds the cap (false fit); rejected_fit = predicted "
+                                             "not to fit but fits (false rejection); correct; accuracy_pct = 100 x "
+                                             "correct / n_pairs; baseline errors equal the judge's N2.2 discordant b "
+                                             "(c = 0), asserted")
+        R["n2_2_discordant_judge"] = {e: {"b_for_accounting": jn22[BASE_NAMES[e]]["b"],
+                                          "c_for_baseline": jn22[BASE_NAMES[e]]["c"]} for e in ("B1", "B2", "B3")}
+        D["n2_2_discordant_judge"] = "N2.2 discordant counts copied from judge_final (b favours the accounting)"
+
+        # 14. static-estimate ratio = baseline estimate / measured minimum peak, all 744 configurations, per class
+        rat, allr = {}, []
+        for e in ("B1", "B2", "B3"):
+            per = {"tied": [], "untied": []}
+            for c in n2["configs"]:
+                per[cls_of(c["config_id"])].append(c["baselines"][BASE_NAMES[e]] / c["measured_min_peak_bytes"])
+            both = per["tied"] + per["untied"]
+            allr += both
+            rat[e] = {"estimator": BASE_NAMES[e], "tied": mmm(per["tied"]), "untied": mmm(per["untied"]),
+                      "overall_min": min(both), "overall_max": max(both)}
+        R["static_estimate_ratio_by_class"] = rat
+        R["static_estimate_ratio_overall_range"] = [min(allr), max(allr)]
+        D["static_estimate_ratio_by_class"] = ("estimate / measured minimum peak over the 744 registry configurations; "
+                                               "tied = shared, two_groups, reversible_shared; untied (distinct-parameter) "
+                                               "= untied, reversible_untied, wide_single; min, median, max per class")
+        D["static_estimate_ratio_overall_range"] = "min and max of the ratio over B1, B2, B3 and all 744 configurations"
+
+        # 15. persistent share = baseline_bytes (W + G + O, L0 of Eq. 1) / min_peak_bytes at the argmin knob
+        share = {cid: at_argmin(cid)["baseline_bytes"] / reg[cid]["min_peak_bytes"] for cid in reg}
+        fin_ids = {cl: sorted({sel_cells[k][cl]["config_id"] for k in finite}) for cl in ("tied", "untied")}
+        all_ids = {c[cl]["config_id"] for c in sel["cells"] for cl in ("tied", "untied")}
+        ids_fin = set(fin_ids["tied"]) | set(fin_ids["untied"])
+        if len(ids_fin) != 22 or len(all_ids - ids_fin) != 3:
+            raise Fail(f"expected 22 finite and 3 unbounded-only selected configurations, got {len(ids_fin)}")
+        R["persistent_share_selected_finite"] = {
+            cl: {"min": min(share[i] for i in fin_ids[cl]), "max": max(share[i] for i in fin_ids[cl]),
+                 "n_configs": len(fin_ids[cl])} for cl in ("tied", "untied")}
+        D["persistent_share_selected_finite"] = ("share = baseline_bytes / min_peak_bytes at the argmin knob over the "
+                                                 "distinct configurations selected in the 21 finite cells (42 class-cells, "
+                                                 "22 configurations), min and max per class")
+        R["persistent_share_unbounded_only"] = {i: share[i] for i in sorted(all_ids - ids_fin)}
+        D["persistent_share_unbounded_only"] = "share of the selections that occur only in the unbounded cells"
+        R["persistent_share_selected_per_config"] = {
+            i: {"baseline_bytes": at_argmin(i)["baseline_bytes"], "min_peak_bytes": reg[i]["min_peak_bytes"],
+                "share": share[i]} for i in sorted(all_ids)}
+        D["persistent_share_selected_per_config"] = "the share and its two byte counts for each of the 25 selections"
+        med, remmed, rem_all = {}, {}, [1 - v for v in share.values()]
+        for t in TASKS:
+            for cl in ("tied", "untied"):
+                v = [share[i] for i in reg if i.split("|")[0] == t and cls_of(i) == cl]
+                med[f"{t}|{cl}"] = statistics.median(v)
+                remmed[f"{t}|{cl}"] = statistics.median(1 - x for x in v)
+        R["persistent_share_registry_median"] = med
+        R["persistent_share_registry_median_range"] = {
+            cl: [min(v for k, v in med.items() if k.endswith(cl)), max(v for k, v in med.items() if k.endswith(cl))]
+            for cl in ("|tied", "|untied")}
+        D["persistent_share_registry_median"] = "median share per task x class over the 744 registry configurations"
+        D["persistent_share_registry_median_range"] = "min and max of the three task medians per class"
+        R["remainder_share_registry_range"] = [min(rem_all), max(rem_all)]
+        R["remainder_share_registry_median"] = remmed
+        R["remainder_share_registry_median_range"] = [min(remmed.values()), max(remmed.values())]
+        D["remainder_share_registry_range"] = "remainder = 1 - share (activations and transients), min and max over 744"
+        D["remainder_share_registry_median"] = "median remainder per task x class over the registry"
+        D["remainder_share_registry_median_range"] = "min and max of the six task x class remainder medians"
+
+        # 16. structure of the 14 distinct finite-cell pairs; n_params from result/s4/confirm/*/result.json
+        conf_np, conf_knob = collections.defaultdict(set), collections.Counter()
+        for f in sorted(glob.glob(str(ROOT / "result/s4/confirm/*/result.json"))):
+            r = json.loads(read_hashed(str(pathlib.Path(f).relative_to(ROOT)), hashes))
+            conf_np[r["config_id"]].add(r["n_params"])
+            conf_knob[f"microbatch {r['microbatch']}, checkpointing {r['checkpointing']}"] += 1
+        if any(len(v) != 1 for v in conf_np.values()):
+            raise Fail("n_params differs across seeds of one configuration")
+        npar = {k: next(iter(v)) for k, v in conf_np.items()}
+        for c in sel["cells"]:
+            for cl in ("tied", "untied"):
+                if c[cl]["n_params"] != npar[c[cl]["config_id"]]:
+                    raise Fail(f"n_params of {c[cl]['config_id']} differs between selection and confirm records")
+        plist, pcaps = [], collections.defaultdict(list)
+        for k in finite:
+            if pair[k] not in pcaps:
+                plist.append((k[0], pair[k]))
+            pcaps[pair[k]].append(k[1])
+        if len(plist) != 14:
+            raise Fail(f"expected 14 distinct finite pairs, got {len(plist)}")
+        ratios_np = [npar[u] / npar[t] for _, (t, u) in plist]
+        wid = collections.Counter(">" if parse(u)["d"] > parse(t)["d"] else "=" if parse(u)["d"] == parse(t)["d"]
+                                  else "<" for _, (t, u) in plist)
+        R["finite_pairs_structure"] = {
+            "n_pairs": len(plist),
+            "tied_T_ge_4": sum(1 for _, (t, u) in plist if parse(t)["T"] >= 4),
+            "untied_T_le_2": sum(1 for _, (t, u) in plist if parse(u)["T"] <= 2),
+            "params_ratio_untied_over_tied_min": min(ratios_np), "params_ratio_untied_over_tied_max": max(ratios_np),
+            "width_untied_gt_tied": wid[">"], "width_untied_eq_tied": wid["="], "width_untied_lt_tied": wid["<"],
+            "n_params_source": "result/s4/confirm/*/result.json (n_params; identical across seeds and equal to "
+                               "selection.json n_params, asserted)",
+            "pairs": [{"task": tk, "caps_kib": pcaps[(t, u)], "tied": t, "untied": u, "tied_n_params": npar[t],
+                       "untied_n_params": npar[u], "params_ratio": npar[u] / npar[t]} for tk, (t, u) in plist]}
+        D["finite_pairs_structure"] = ("the distinct (tied, untied) selected pairs over the 21 finite cells: tied T >= 4, "
+                                       "untied T <= 2 (wide_single has T = 1), parameter-count ratio untied / tied, "
+                                       "and widths d compared")
+        R["confirm_runs_knob"] = dict(conf_knob)
+        D["confirm_runs_knob"] = "confirmation-run records by training knob (microbatch, checkpointing)"
+
+        # 17. multiplicity readings (post hoc): Holm convention check, KWS cells, Holm over the 14 pairs
+        fams = {"E_plus": "p_plus", "E_minus": "p_minus", "two_sided": "p_zero"}
+        for fam in fams.values():
+            adj = holm({f"{k[0]}|{k[1]}": fin[k][fam] for k in finite})
+            if any(adj[f"{k[0]}|{k[1]}"] != fin[k][fam + "_holm"] for k in finite):
+                raise Fail(f"derived_numbers.holm does not reproduce the judge's {fam}_holm")
+        R["holm_convention_matches_judge"] = True
+        D["holm_convention_matches_judge"] = ("derived_numbers.holm over the 21 finite cells reproduces judge_final's "
+                                              "p_plus_holm, p_minus_holm and p_zero_holm exactly (asserted)")
+        R["kws_upper_above_floor_p"] = {str(c): {"p_zero": fin[("KWS", c)]["p_zero"],
+                                                 "p_zero_holm_21": fin[("KWS", c)]["p_zero_holm"],
+                                                 "mean": fin[("KWS", c)]["mean"]} for c in (406, 645, 813)}
+        D["kws_upper_above_floor_p"] = ("the three Speech Commands cells whose upper bound exceeds the floor: unadjusted "
+                                        "two-sided p and its 21-cell Holm value, from judge_final")
+        pp = {}
+        for tk, pr in plist:
+            ks = [k for k in finite if pair[k] == pr]
+            lab = f"{tk}|" + "-".join(str(k[1]) for k in ks)
+            for f in ("p_plus", "p_minus", "p_zero", "mean", "upper_bound_95", "floor"):
+                if len({fin[k][f] for k in ks}) != 1:
+                    raise Fail(f"cells of pair {lab} differ in {f}")
+            pp[lab] = fin[ks[0]]
+        h14 = {}
+        for fn, fam in fams.items():
+            adj = holm({lab: c[fam] for lab, c in pp.items()})
+            h14[fn] = {"n_tests": len(adj), "min_adjusted": min(adj.values()),
+                       "significant_at_0.05": {lab: {"p_holm_14": v, "p_raw": pp[lab][fam], "mean": pp[lab]["mean"]}
+                                               for lab, v in sorted(adj.items(), key=lambda kv: kv[1]) if v < 0.05}}
+        R["holm_over_14_pairs_final"] = h14
+        D["holm_over_14_pairs_final"] = ("post hoc: Holm over the 14 distinct finite pairs instead of the 21 cells, final "
+                                         "look, per event family (E_plus = p_plus, E_minus = p_minus, two_sided = p_zero); "
+                                         "every pair with adjusted p < 0.05")
+        R["pairs_upper_below_floor"] = {"n": sum(1 for c in pp.values() if c["upper_bound_below_floor"]),
+                                        "of": len(pp),
+                                        "not_below": [lab for lab, c in pp.items() if not c["upper_bound_below_floor"]]}
+        D["pairs_upper_below_floor"] = "distinct finite pairs whose one-sided 95% upper bound U is below the floor"
+
+        # 18. margins t_{0.95, n-1} x SD / sqrt(n), final look
+        marg, mdiff = {}, 0.0
+        for k in finite:
+            c = fin[k]
+            m = float(stats.t.ppf(0.95, c["n"] - 1)) * c["sd"] / math.sqrt(c["n"])
+            mdiff = max(mdiff, abs((c["upper_bound_95"] - c["mean"]) - m))
+            marg[f"{k[0]}|{k[1]}"] = m
+        if mdiff > 1e-9:
+            raise Fail(f"U - mean differs from the margin by {mdiff}")
+        kw = [v for k, v in marg.items() if k.startswith("KWS|")]
+        R["margin_95_final"] = {"min": min(marg.values()), "max": max(marg.values()), "KWS_min": min(kw),
+                                "KWS_max": max(kw), "max_abs_diff_U_minus_mean": mdiff, "per_cell": marg}
+        D["margin_95_final"] = ("t_{0.95, n-1} x SD / sqrt(n) per finite cell at n = 12 (scipy.stats.t.ppf); "
+                                "max_abs_diff_U_minus_mean = largest |(U - mean) - margin| against judge_final")
+
+        # 19. post hoc one-sided 97.5% bounds mean + t_{0.975, n-1} x SD / sqrt(n), both looks
+        b975 = {}
+        for look, J in (("first", first), ("final", fin)):
+            vals = {}
+            for k in finite:
+                c = J[k]
+                vals[f"{k[0]}|{k[1]}"] = (c["mean"] + float(stats.t.ppf(0.975, c["n"] - 1)) * c["sd"] / math.sqrt(c["n"]),
+                                          c["floor"], c["n"])
+            b975[look] = {"n_seeds": sorted({v[2] for v in vals.values()}),
+                          "n_below_floor": sum(1 for v in vals.values() if v[0] < v[1]), "of": len(vals),
+                          "not_below": {k: v[0] for k, v in vals.items() if not v[0] < v[1]}}
+            if look == "final":
+                b975[look]["KWS_406_645_813"] = [vals[f"KWS|{c}"][0] for c in (406, 645, 813)]
+        R["upper_bound_97_5_post_hoc"] = b975
+        D["upper_bound_97_5_post_hoc"] = ("post hoc one-sided 97.5% bound per finite cell, mean and SD from each judge "
+                                          "file (first look n = 10, final n = 12); count below the floor")
+
+        # 20. knob regime
+        mb_reg = collections.Counter(reg[i]["argmin_knob"]["microbatch"] for i in reg)
+        allow_ck = {i for i in reg if any(x["checkpointing"] for x in reg[i]["measurements"])}
+        if allow_ck != {i for i in reg if not parse(i)["structure"].startswith("reversible")}:
+            raise Fail("checkpointing-capable configurations are not exactly the non-reversible ones")
+        cc = [(k, sel_cells[k][cl]["config_id"]) for k in finite for cl in ("tied", "untied")]
+        r64 = [peak64(i) / (1024 * k[1]) for k, i in cc]
+        R["knob_regime"] = {
+            "registry_argmin_microbatch": {str(k): v for k, v in sorted(mb_reg.items())},
+            "registry_checkpointing_allowed": len(allow_ck),
+            "registry_checkpointing_on_at_argmin": sum(1 for i in allow_ck if reg[i]["argmin_knob"]["checkpointing"]),
+            "classcells_42_argmin_microbatch": {str(k): v for k, v in sorted(collections.Counter(
+                reg[i]["argmin_knob"]["microbatch"] for _, i in cc).items())},
+            "classcells_42_checkpointing_on": sum(1 for _, i in cc if reg[i]["argmin_knob"]["checkpointing"]),
+            "classcells_42_peak_mb64_nockpt_over_cap_min": min(r64),
+            "classcells_42_peak_mb64_nockpt_over_cap_max": max(r64),
+            "classcells_42_peak_mb64_nockpt_over_cap_gt1": sum(1 for v in r64 if v > 1), "n_classcells": len(cc)}
+        D["knob_regime"] = ("argmin knob of the registry and of the 42 finite class-cells; checkpointing-capable = "
+                            "configurations with a checkpointing measurement (asserted = non-reversible); peak at "
+                            "microbatch 64 without checkpointing (the confirmation knob) / (1024 x cap)")
+
+        # 21. Speech Commands silence clips
+        meta = {s: json.loads(X[f"kws_{s}_meta"])["clips"] for s in ("train", "val", "test")}
+        sil = {s: [c for c in meta[s] if c["word"] == "_silence_"] for s in meta}
+        tr_off = collections.defaultdict(list)
+        for c in sil["train"]:
+            tr_off[c["source"]].append(c["offset"])
+        ov = sum(1 for c in sil["val"] if any(abs(c["offset"] - o) < 16000 for o in tr_off[c["source"]]))
+        R["kws_silence"] = {
+            "counts": {s: len(v) for s, v in sil.items()},
+            "val_overlapping_train_same_source": ov, "val_total": len(sil["val"]),
+            "test_by_source_prefix": dict(collections.Counter(c["source"].split("/")[0] + "/" for c in sil["test"])),
+            "test_with_offset": sum(1 for c in sil["test"] if "offset" in c)}
+        D["kws_silence"] = ("silence clips (word _silence_) per split; validation clips whose [offset, offset + 16000) "
+                            "overlaps a training clip interval of the same source file; test silence by source prefix")
+
+        # 22. fp32 knob-equivalence evidence copied from the REPORT block of the v4 train test log
+        i0 = log.index("REPORT ") + len("REPORT ")
+        rep, _ = json.JSONDecoder().raw_decode(log, i0)
+        ran = re.search(r"^Ran (\d+) tests", log, re.M)
+        tree = ast.parse(X["train_test_source"].decode())
+        names = [f"{c.name}.{f.name}" for c in tree.body if isinstance(c, ast.ClassDef)
+                 and any(getattr(b, "attr", getattr(b, "id", "")) == "TestCase" for b in c.bases)
+                 for f in c.body if isinstance(f, ast.FunctionDef) and f.name.startswith("test_")]
+        if not ran or int(ran.group(1)) != len(names):
+            raise Fail("test count in the log differs from the test methods in test/lb/test_train.py")
+        gopt = collections.defaultdict(dict)
+        for k, row in rep["fp32_gradient_reported"].items():
+            o = k.split(" ")[0].split("|")[-1]
+            for c, v in row.items():
+                gopt[o][c] = max(gopt[o].get(c, v), v)
+        R["fp32_knob_equivalence"] = {
+            "log": SOURCES["train_test_log"][0], "tests_ran": int(ran.group(1)), "ok": True,
+            "test_names_from_source": names,
+            "parameter_max_rel_diff_per_optimizer": rep["fp32_parameter_reported_max_per_optimizer"],
+            "gradient_max_rel_diff_all": rep["fp32_gradient_reported_max"],
+            "gradient_max_rel_diff_per_task": rep["fp32_gradient_reported_max_per_task"],
+            "gradient_max_rel_diff_per_optimizer_selected": dict(gopt),
+            "n_gradient_entries": len(rep["fp32_gradient_reported"]),
+            "n_parameter_entries": len(rep["fp32_parameter_reported"])}
+        D["fp32_knob_equivalence"] = ("values copied from the REPORT block (test_fp32_reported): parameter max relative "
+                                      "differences after three fp32 updates per optimizer, gradient maxima overall and per "
+                                      "task; gradient_max_rel_diff_per_optimizer_selected = the largest logged entry per "
+                                      "optimizer (a selection of logged values, no recomputation); test names parsed from "
+                                      "test/lb/test_train.py (the log prints dots only), count asserted equal to 'Ran N'")
+
+        # 23. optimizer counts
+        unb = [c for c in sel["cells"] if c["cap_kib"] == "unbounded"]
+        R["optimizer_counts_unbounded_6"] = dict(collections.Counter(c[cl]["optimizer"] for c in unb
+                                                                     for cl in ("tied", "untied")))
+        R["optimizer_unbounded_exceptions"] = [[c["task"], cl, c[cl]["config_id"]] for c in unb
+                                               for cl in ("tied", "untied") if c[cl]["optimizer"] != "adafactor"]
+        D["optimizer_counts_unbounded_6"] = "optimizers of the 6 unbounded class-cells (all 48: optimizer_counts_48)"
+        D["optimizer_unbounded_exceptions"] = "unbounded class-cells not selecting Adafactor"
+
+        # 24. runs before protocol version 4 (result/s3/{lrcal,floor,bars}; not result/s3/v4)
+        frozen = str(yaml.safe_load(X["prereg_v4"])["date_frozen"])
+        v3 = {}
+        for g in ("lrcal", "floor", "bars"):
+            fs = sorted(glob.glob(str(ROOT / f"result/s3/{g}/*/result.json")))
+            if not fs:
+                raise Fail(f"no v3 run records in result/s3/{g}")
+            rs = [json.loads(read_hashed(str(pathlib.Path(f).relative_to(ROOT)), hashes)) for f in fs]
+            last = max(r["end_utc"] for r in rs)
+            v3[g] = {"n": len(rs), "by_mode": dict(collections.Counter(r["mode"] for r in rs)),
+                     "n_test_acc_nonnull": sum(1 for r in rs if r.get("test_acc") is not None),
+                     "n_test_acc_key_missing": sum(1 for r in rs if "test_acc" not in r),
+                     "prereg_sha256": sorted({r.get("prereg_sha256") for r in rs}),
+                     "latest_end_utc": last, "before_v4_freeze": utc(last) < utc(frozen)}
+        R["runs_before_v4"] = {"v4_date_frozen": frozen, "groups": v3,
+                               "any_test_acc": any(v["n_test_acc_nonnull"] for v in v3.values()),
+                               "all_before_v4_freeze": all(v["before_v4_freeze"] for v in v3.values())}
+        D["runs_before_v4"] = ("v3 run records under result/s3/{lrcal,floor,bars}: counts by mode, non-null test_acc, "
+                               "latest end_utc against date_frozen of PREREGISTERED_loopbudget_v4.yaml")
+
         out = {"name": "s8_derived_numbers", "written_utc": datetime.datetime.now(datetime.timezone.utc)
                .strftime("%Y-%m-%dT%H:%M:%SZ"), "script_sha256": sha(pathlib.Path(__file__)),
-               "sources_sha256": hashes, "values": R}
+               "sources_sha256": hashes, "values": R, "definitions": D}
     except Fail as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 2
