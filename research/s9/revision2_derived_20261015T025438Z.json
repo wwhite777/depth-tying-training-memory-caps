@@ -1,0 +1,128 @@
+{
+ "kind": "post hoc numbers of the second external-review revision",
+ "labelling": "post hoc",
+ "written_utc": "2026-10-15T02:54:39Z",
+ "script_sha256": "3d8b1cbf8448ab8104060a602eccd61601cb9b9cb7b4296177ad96693a7201a4",
+ "sources_sha256": {
+  "research/s4/judge_20261011T045319Z.json": "ed6375cf8b3f837dbe0886ad345fef847b66f31803fe0199aa64b173263d6d45",
+  "research/s4/judge_final_20261011T054347Z.json": "e0bc089578fbff704af37098269b2caa334bc12ff65094c7eacec242476e35b1",
+  "research/s9/transfer_analysis_20261014T180351Z.json": "f0929e90c314e3728cb323bfd5968be2b3f1825134fb7cfa8bdd4301f9587666"
+ },
+ "scipy": "1.18.1",
+ "values": {
+  "holm_14_pairs_both_looks": {
+   "p_plus": {
+    "n_tests": 28,
+    "significant_at_0.05": {},
+    "min_adjusted": 1.0
+   },
+   "p_minus": {
+    "n_tests": 28,
+    "significant_at_0.05": {
+     "final::CIFAR10|406": {
+      "p_holm_28": 0.036702400257710946,
+      "p_raw": 0.0013108000092039622
+     }
+    },
+    "min_adjusted": 0.036702400257710946
+   },
+   "p_zero": {
+    "n_tests": 28,
+    "significant_at_0.05": {
+     "first::CIFAR10|323": {
+      "p_holm_28": 0.0015825650519511862,
+      "p_raw": 6.330260207804745e-05
+     },
+     "first::CIFAR10|406": {
+      "p_holm_28": 0.0012165594163049053,
+      "p_raw": 4.67907467809579e-05
+     },
+     "final::CIFAR10|323": {
+      "p_holm_28": 0.0001823031053986791,
+      "p_raw": 6.751966866617744e-06
+     },
+     "final::CIFAR10|406": {
+      "p_holm_28": 8.52107136409802e-05,
+      "p_raw": 3.0432397728921504e-06
+     }
+    },
+    "min_adjusted": 8.52107136409802e-05
+   }
+  },
+  "transfer_run_delta_range": [
+   -1.3912453342382207,
+   0.7125890736342058
+  ],
+  "transfer_runs_beyond_0_5": {
+   "n": 8,
+   "of": 66
+  },
+  "transfer_config_mean_range": [
+   -0.7917656373713413,
+   0.22494887525562035
+  ],
+  "transfer_har_config_means": {
+   "HAR|reversible_shared|d32|T4|adafactor": -0.15835312747426636,
+   "HAR|reversible_untied|d64|T2|adafactor": -0.7917656373713413,
+   "HAR|untied|d24|T2|adafactor": -0.29408437959506745
+  },
+  "transfer_loss_rel_diff_median_by_task": {
+   "CIFAR10": 4.4130075202465426e-07,
+   "HAR": 0.325100804542389,
+   "KWS": 0.020078839396967762
+  },
+  "transfer_loss_rel_diff_median_all": 0.005800593828231215,
+  "transfer_har_comparator_final_loss_max": 0.0063705177923035206,
+  "transfer_largest_loss_rel_diff": {
+   "config_id": "HAR|untied|d24|T2|adafactor",
+   "seed": 3,
+   "final_loss_feasible": 0.001230854033575741,
+   "final_loss_comparator": 0.00011172164018642294,
+   "final_loss_rel_diff": 10.017149690264944,
+   "delta_pp": -0.8483203257550116
+  },
+  "transfer_har_cells": {
+   "256": {
+    "D_comparator_pp": -0.5203031331297439,
+    "D_feasible_pp": -0.384571881008938
+   },
+   "323": {
+    "D_comparator_pp": -0.5203031331297439,
+    "D_feasible_pp": -0.384571881008938
+   },
+   "406": {
+    "D_comparator_pp": -1.707951589186763,
+    "D_feasible_pp": -1.0745390792896643
+   },
+   "512": {
+    "D_comparator_pp": -1.707951589186763,
+    "D_feasible_pp": -1.0745390792896643
+   },
+   "645": {
+    "D_comparator_pp": -1.707951589186763,
+    "D_feasible_pp": -1.0745390792896643
+   },
+   "813": {
+    "D_comparator_pp": -1.707951589186763,
+    "D_feasible_pp": -1.0745390792896643
+   },
+   "1024": {
+    "D_comparator_pp": -1.707951589186763,
+    "D_feasible_pp": -1.0745390792896643
+   }
+  },
+  "transfer_seed_block": {
+   "seed_means": [
+    -0.0563434135678113,
+    0.007594221908737547,
+    -0.16253506311825205
+   ],
+   "mean": -0.07042808492577528,
+   "df": 2,
+   "ci90": [
+    -0.21530152362956118,
+    0.07444535377801063
+   ]
+  }
+ }
+}

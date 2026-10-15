@@ -76,13 +76,19 @@ repeated at microbatch 64 with the CPU build of torch 2.10.0 and matched bit for
 (`research/s9/precondE_20261014T080923Z.json`).
 
 - Mean change in test accuracy over the 22 configurations: −0.07 points, 90% interval −0.15 to +0.01, inside the
-  margin (verdict SUPPORTED). By task: UCI-HAR −0.41 (3 configurations), Speech Commands −0.04 (9), CIFAR-10 +0.01
-  (10).
+  margin (verdict SUPPORTED on average). By task: CIFAR-10 +0.01 (10 configurations; −0.02 to +0.04), Speech Commands
+  −0.04 (9; −0.19 to +0.10), UCI-HAR −0.41 (3; −0.98 to +0.15, wider than the margin, so unresolved there; the three
+  configurations moved by −0.16, −0.29 and −0.79). Single runs moved by −1.39 to +0.71 points; 8 of 66 by more than
+  0.5. A post hoc interval with the three seeds as blocks is −0.22 to +0.07
+  (`research/s9/revision2_derived_20261015T025438Z.json`).
 - Single-run changes averaged 0.40 times the seed-to-seed standard deviation; 18 of the 30 CIFAR-10 runs reproduced
   the archived test accuracy exactly.
 - Per cell, the tied-minus-distinct difference over seeds 1–3 moved by at most 0.63 points; its sign changed only at
   Speech Commands 512 KiB (−0.29 to +0.22 points).
 - The 66 runs took 68.8 core-hours, about 11 times their microbatch-64 time.
+- Re-profiling the 22 configurations with the CPU build used for these runs reproduced all 294 measurements of the
+  archived profiles, including the hash of every allocation trace (`research/s9/reprofile_compare_20261015T025405Z.json`,
+  records in `result/s9/reprofile_cpu/`), so the runs trained within their caps.
 
 Results: `research/s9/transfer_analysis_20261014T180351Z.json`; run records: `result/s9/transfer/` and
 `result/s9/transfer_env/`.
@@ -112,8 +118,10 @@ does not include the allocator's cached or fragmented bytes, the Python interpre
   memory-minimal settings (seeds 1–3). The selection runs (one seed for each of the 744 configurations) were not
   repeated at the memory-minimal settings.
 - Speech Commands silence: the training and validation silence clips are crops of the same six background
-  recordings (all 463 validation silence clips overlap a training crop); the origin of the 408 official test silence
-  clips relative to those recordings was not checked.
+  recordings (all 463 validation silence clips overlap a training crop), and so are the official test silence clips:
+  400 of 408 are volume-scaled crops of them (normalized cross-correlation at least 0.999), each overlapping a training
+  crop, and the other 8 match the same recordings at 0.92–0.9987 (`research/s9/silence_origin_20261015T025536Z.json`).
+  The silence class (8.3% of the test set) is shared across all splits, for both model classes alike.
 - The comparison is matched on the memory cap only; it is not compute- or wall-time-matched.
 - All dates and times in the records are self-recorded.
 
@@ -279,6 +287,35 @@ CUDA_VISIBLE_DEVICES="" OMP_NUM_THREADS=1 PYTHONPATH=src python -m lb.train --co
 
 The 66 runs were launched with `python -m lb.launch --specs research/s9/transfer_specs_seeds123.jsonl --jobs 7`, after
 `research/s9/transfer_specs_precondE.jsonl` (the two environment reruns).
+
+**(j) Checks added in release 1.2** (numpy and scipy suffice; the silence fetch needs network access):
+
+```
+python research/s9/revision2_derived.py --out rerun/revision2_derived.json
+python -c "import json; a=json.load(open('rerun/revision2_derived.json')); b=json.load(open('research/s9/revision2_derived_20261015T025438Z.json')); print(a['values']==b['values'])"
+python research/s9/reprofile_compare.py --out rerun/reprofile_compare.json
+python research/s9/silence_origin.py selftest
+python research/s9/silence_origin.py fetch --workdir rerun/kws_silence
+python research/s9/silence_origin.py analyse --workdir rerun/kws_silence --out rerun/silence_origin.json
+```
+
+The first comparison prints `True`; `reprofile_compare.py` (which needs the profiles of step (c)) prints "22 of 22
+configurations identical over 294 measurements; PASS". The fetch streams the two Speech Commands archives from their
+original host, checks them against the sha256 in `research/s3/data_manifest.json` and keeps only the six background
+recordings and the 408 test silence clips. The re-profiles themselves were made with
+`python -m lb.launch --specs research/s9/reprofile_specs_cpu.jsonl --jobs 4` in the environment of
+`research/s9/transfer_probe/ENV_FREEZE_probe_20261014T070246Z.txt`.
+
+## Changes in release 1.2 (2026-10-15)
+
+Added after a second round of external reviews. No frozen file, run record or number of release 1.1 changed.
+
+- `research/s9/revision2_derived.py` and its output: post hoc readings of the transfer check (per task, per
+  configuration and per run, seed blocks, loss differences by task) and the 14-pair Holm family pooled over both looks.
+- `research/s9/reprofile_compare.py`, `research/s9/reprofile_specs_cpu.jsonl`, `result/s9/reprofile_cpu/` and the
+  comparison output: the 22 selected configurations re-profiled in the transfer environment.
+- `research/s9/silence_origin.py` and its output: where the official Speech Commands test silence clips come from.
+- This README: the transfer section, the silence limitation and step (j).
 
 ## Changes in release 1.1 (2026-10-14)
 

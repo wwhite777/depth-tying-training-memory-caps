@@ -1,0 +1,481 @@
+{
+ "kind": "re-profile of the 22 finite-cap selections under the transfer environment",
+ "written_utc": "2026-10-15T02:54:06Z",
+ "script_sha256": "f16e009e9e3701eed7208c788ef9fb6fd0f71f9230e175bbe83546c30a821b07",
+ "fields": [
+  "peak_bytes",
+  "baseline_bytes",
+  "peak_phase",
+  "closure_error",
+  "trace_len",
+  "trace_sha256"
+ ],
+ "n_configs": 22,
+ "n_measurements": 294,
+ "n_identical_configs": 22,
+ "all_identical": true,
+ "configs": [
+  {
+   "config_id": "CIFAR10|shared|d24|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    247768,
+    247768
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|shared|d32|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    304632,
+    304632
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|shared|d32|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    331128,
+    331128
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|shared|d48|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    474552,
+    474552
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|shared|d64|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    646648,
+    646648
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|shared|d64|T8|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    732408,
+    732408
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|untied|d24|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    304968,
+    304968
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|untied|d32|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    371688,
+    371688
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|untied|d48|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    532776,
+    532776
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "CIFAR10|wide_single|d32|T1|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    249144,
+    249144
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "HAR|reversible_shared|d32|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    120136,
+    120136
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    }
+   ],
+   "n_measurements": 7,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "HAR|reversible_untied|d64|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    332264,
+    332264
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    }
+   ],
+   "n_measurements": 7,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "HAR|untied|d24|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    109160,
+    109160
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|shared|d32|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    218368,
+    218368
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|shared|d64|T8|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    596608,
+    596608
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|two_groups|d32|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    317672,
+    317672
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|two_groups|d32|T8|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    362984,
+    362984
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|untied|d24|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    211768,
+    211768
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|untied|d32|T2|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    269464,
+    269464
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|untied|d32|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    445416,
+    445416
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|untied|d64|T4|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    984424,
+    984424
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": true
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  },
+  {
+   "config_id": "KWS|wide_single|d64|T1|adafactor",
+   "identical": true,
+   "differences": [],
+   "min_peak_bytes": [
+    391600,
+    391600
+   ],
+   "argmin_knob": [
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    },
+    {
+     "microbatch": 1,
+     "checkpointing": false
+    }
+   ],
+   "n_measurements": 14,
+   "code_freeze_equal": true
+  }
+ ]
+}
